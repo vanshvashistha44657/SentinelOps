@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SentinelOps
 
 SentinelOps is a production-quality, enterprise-grade Security Operations Center (SOC) platform designed to simulate real security operations.
@@ -34,3 +35,6 @@ sentinelsops/
 ```
 
 Refer to `ARCHITECTURE.md` for architectural design decisions.
+=======
+# SentinelOps
+>>>>>>> d594c5e851e372a7089bb4c454f00e5d7decb72e
