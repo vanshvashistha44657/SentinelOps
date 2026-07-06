@@ -1,0 +1,765 @@
+# SentinelOps
+
+> **Monitor. Detect. Investigate. Respond.**
+
+## Vision
+
+SentinelOps is a production-quality Security Operations Center (SOC) platform designed to simulate real enterprise security operations.
+
+This project is intended as a flagship cybersecurity portfolio demonstrating skills in:
+
+- SOC Operations
+- Blue Team
+- Detection Engineering
+- Incident Response
+- Threat Hunting
+- Secure Software Engineering
+- FastAPI
+- PostgreSQL
+- Next.js
+- Clean Architecture
+
+This is NOT a CRUD application.
+
+The application should resemble commercial platforms such as:
+
+- Microsoft Sentinel
+- Splunk Enterprise Security
+- IBM QRadar
+- Google Chronicle
+- Elastic Security
+- Wazuh
+
+The project should be production-ready and suitable for deployment.
+
+---
+
+# Primary Goals
+
+The application must simulate the complete SOC lifecycle:
+
+```
+Logs
+    ↓
+Parsing
+    ↓
+Normalization
+    ↓
+Enrichment
+    ↓
+Detection Engine
+    ↓
+Alert
+    ↓
+Incident
+    ↓
+Case
+    ↓
+Investigation
+    ↓
+Response
+    ↓
+Reporting
+```
+
+---
+
+# Technology Stack
+
+## Backend
+
+Python 3.13+
+
+FastAPI
+
+SQLAlchemy 2.x
+
+Alembic
+
+PostgreSQL
+
+Redis
+
+Celery
+
+APScheduler
+
+Pydantic v2
+
+Python-JOSE
+
+Argon2
+
+Structlog
+
+Pytest
+
+---
+
+## Frontend
+
+Next.js
+
+React
+
+TypeScript
+
+Tailwind CSS
+
+shadcn/ui
+
+Framer Motion
+
+TanStack Query
+
+React Hook Form
+
+Zustand
+
+---
+
+## Infrastructure
+
+Docker
+
+Docker Compose
+
+Nginx
+
+GitHub Actions
+
+Prometheus
+
+Grafana
+
+---
+
+# Architecture
+
+Follow Clean Architecture.
+
+```
+Presentation
+
+↓
+
+Application
+
+↓
+
+Domain
+
+↓
+
+Infrastructure
+```
+
+Never violate dependency flow.
+
+---
+
+# Backend Structure
+
+```
+backend/
+
+app/
+
+api/
+
+routers/
+
+dependencies/
+
+middleware/
+
+core/
+
+config.py
+
+security.py
+
+logging.py
+
+database.py
+
+domain/
+
+entities/
+
+enums/
+
+value_objects/
+
+repositories/
+
+application/
+
+services/
+
+dto/
+
+repositories/
+
+infrastructure/
+
+database/
+
+redis/
+
+tasks/
+
+workers/
+
+models/
+
+schemas/
+
+utils/
+
+tests/
+
+alembic/
+```
+
+---
+
+# Coding Rules
+
+Use SOLID principles.
+
+Use Repository Pattern.
+
+Business logic belongs ONLY inside Services.
+
+Routers should:
+
+- Validate input
+- Call service
+- Return response
+
+Never write business logic inside routers.
+
+Use dependency injection.
+
+Use type hints everywhere.
+
+Use docstrings.
+
+Follow PEP8.
+
+---
+
+# Authentication
+
+JWT Access Tokens
+
+Refresh Tokens
+
+Argon2 Password Hashing
+
+RBAC
+
+Permissions
+
+Login History
+
+Audit Logging
+
+Rate Limiting
+
+Secure Headers
+
+OWASP Best Practices
+
+---
+
+# User Roles
+
+Administrator
+
+SOC Manager
+
+SOC Analyst L1
+
+SOC Analyst L2
+
+Threat Hunter
+
+Read Only Auditor
+
+Support custom permissions.
+
+---
+
+# Database Tables
+
+Users
+
+Roles
+
+Permissions
+
+Alerts
+
+Incidents
+
+Cases
+
+Assets
+
+IOC Records
+
+Threat Intelligence
+
+Threat Feeds
+
+Detection Rules
+
+Rule Versions
+
+Notifications
+
+Audit Logs
+
+Reports
+
+Analyst Notes
+
+Evidence
+
+Attachments
+
+Playbooks
+
+System Settings
+
+API Keys
+
+Login History
+
+---
+
+# Modules
+
+Authentication
+
+Dashboard
+
+Alert Engine
+
+Detection Rules
+
+Threat Hunting
+
+Threat Intelligence
+
+IOC Management
+
+Log Analysis
+
+Incident Management
+
+Case Management
+
+Asset Management
+
+Evidence Management
+
+Audit Logs
+
+Reports
+
+Notifications
+
+Admin Panel
+
+SOC Metrics
+
+Playbooks
+
+System Settings
+
+---
+
+# Event Pipeline
+
+Every event follows this pipeline:
+
+Raw Log
+
+↓
+
+Parser
+
+↓
+
+Normalizer
+
+↓
+
+Enrichment
+
+↓
+
+Detection Rule
+
+↓
+
+Alert
+
+↓
+
+Incident
+
+↓
+
+Case
+
+↓
+
+Playbook
+
+↓
+
+Resolution
+
+---
+
+# Detection Engine
+
+Support detections for:
+
+Brute Force
+
+Password Spray
+
+SQL Injection
+
+Cross Site Scripting
+
+Reverse Shell
+
+Beaconing
+
+DNS Tunneling
+
+PowerShell Abuse
+
+Privilege Escalation
+
+Malware
+
+Ransomware
+
+Data Exfiltration
+
+Persistence
+
+Lateral Movement
+
+Each alert must contain:
+
+Severity
+
+Confidence Score
+
+MITRE ATT&CK Mapping
+
+Rule
+
+Timestamp
+
+Source IP
+
+Destination IP
+
+Username
+
+Hostname
+
+Asset
+
+Status
+
+Assigned Analyst
+
+Evidence
+
+Recommended Response
+
+---
+
+# Threat Intelligence
+
+Application must work offline.
+
+External APIs are optional.
+
+Support:
+
+AbuseIPDB
+
+VirusTotal
+
+AlienVault OTX
+
+GreyNoise
+
+URLhaus
+
+CIRCL
+
+---
+
+# IOC Types
+
+IPv4
+
+IPv6
+
+Domain
+
+URL
+
+SHA256
+
+SHA1
+
+MD5
+
+Registry Key
+
+Process
+
+Email
+
+Each IOC includes:
+
+Risk Score
+
+Tags
+
+MITRE Mapping
+
+Description
+
+References
+
+---
+
+# Incident Management
+
+Each incident contains:
+
+Timeline
+
+Notes
+
+Evidence
+
+Tasks
+
+Resolution
+
+Root Cause
+
+MITRE Mapping
+
+Related Alerts
+
+Related Assets
+
+Attachments
+
+Analyst Assignment
+
+---
+
+# Dashboard Widgets
+
+Critical Alerts
+
+Incident Queue
+
+Analyst Workload
+
+MITRE Heatmap
+
+Attack Timeline
+
+Threat Feed
+
+IOC Statistics
+
+Detection Trends
+
+Security Score
+
+Latest CVEs
+
+System Health
+
+Recent Activity
+
+---
+
+# Reports
+
+Daily SOC Report
+
+Weekly Report
+
+Monthly Report
+
+Executive Report
+
+Incident Report
+
+Analyst Performance
+
+Detection Coverage
+
+MTTD
+
+MTTR
+
+False Positives
+
+Export:
+
+PDF
+
+CSV
+
+---
+
+# Admin Panel
+
+User Management
+
+Role Management
+
+Permission Management
+
+Detection Rules
+
+Threat Feed Configuration
+
+Password Policies
+
+Audit Logs
+
+Notification Settings
+
+API Keys
+
+System Configuration
+
+---
+
+# Testing
+
+Every module requires:
+
+Unit Tests
+
+Integration Tests
+
+API Tests
+
+RBAC Tests
+
+Repository Tests
+
+Coverage Reports
+
+---
+
+# Documentation
+
+Maintain:
+
+README.md
+
+INSTALL.md
+
+DEPLOYMENT.md
+
+ARCHITECTURE.md
+
+ERD.md
+
+API.md
+
+CHANGELOG.md
+
+SECURITY.md
+
+Folder Structure
+
+Screenshots Checklist
+
+Interview Questions
+
+---
+
+# Development Workflow
+
+Build ONLY one phase at a time.
+
+Phases:
+
+1. Architecture
+2. Database
+3. Backend Foundation
+4. Authentication
+5. Dashboard
+6. Detection Engine
+7. Log Analysis
+8. Incident Management
+9. Threat Intelligence
+10. IOC Management
+11. Reports
+12. Admin Panel
+13. Testing
+14. Deployment
+
+Never skip phases.
+
+Stop after every phase.
+
+Explain:
+
+- Files created
+- Design decisions
+- Security decisions
+- Improvements
+
+Wait for approval before continuing.
+
+---
+
+# Code Quality Requirements
+
+Every commit must be production quality.
+
+Avoid placeholder implementations unless explicitly requested.
+
+Prefer maintainability over cleverness.
+
+Write interview-ready code with clear naming, modular design, and comprehensive documentation.
+
+---
+
+# AI Instructions
+
+Before making changes:
+
+1. Read this PROJECT.md completely.
+2. Understand the current repository.
+3. Do not rewrite existing architecture without justification.
+4. Reuse existing utilities and patterns.
+5. Keep changes consistent with Clean Architecture.
+6. If requirements conflict, ask for clarification instead of guessing.
+7. Explain all significant architectural decisions after completing each phase.
