@@ -37,15 +37,17 @@ class Notification(Base):
     # Relationships
     user: Mapped["User"] = relationship("User")
 
-class AuditLog(Base):
-    __tablename__ = "audit_logs"
+class AuditTrail(Base):
+    __tablename__ = "audit_trails"
     
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     user_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
-    action: Mapped[str] = mapped_column(String(100), index=True)  # e.g., USER_LOGIN, ALERT_CLOSE, RULE_CREATE
-    details: Mapped[Optional[dict]] = mapped_column(JSON)  # rich metadata about the mutation
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
     ip_address: Mapped[str] = mapped_column(String(45))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    resource: Mapped[str] = mapped_column(String(100), index=True) # e.g., 'alerts', 'incidents'
+    action: Mapped[str] = mapped_column(String(100), index=True)  # e.g., 'CREATE', 'UPDATE', 'DELETE'
+    prev_values: Mapped[Optional[dict]] = mapped_column(JSON)
+    new_values: Mapped[Optional[dict]] = mapped_column(JSON)
     
     # Relationships
     user: Mapped[Optional["User"]] = relationship("User")

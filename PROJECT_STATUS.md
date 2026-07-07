@@ -28,14 +28,14 @@
 - [x] Alert Service
 
 ## Upcoming
-- [ ] Phase 1: Authorization & API Security
-- [ ] Phase 2: Enterprise Log Ingestion Engine
-- [ ] Phase 3: Alert Correlation Engine
-- [ ] Phase 4: Incident Management
-- [ ] Phase 5: Case Management
-- [ ] Phase 6: IOC Management
-- [ ] Phase 7: Threat Intelligence
-- [ ] Phase 8: Threat Hunting
+- [x] Phase 1: Authorization & API Security
+- [x] Phase 2: Enterprise Log Ingestion Engine
+- [x] Phase 3: Alert Correlation Engine
+- [x] Phase 4: Incident Management
+- [x] Phase 5: Case Management
+- [x] Phase 6: IOC Management
+- [x] Phase 7: Threat Intelligence
+- [x] Phase 8: Threat Hunting
 - [ ] Phase 9: WebSocket Notifications
 - [ ] Phase 10: Reports
 - [ ] Phase 11: Admin Panel

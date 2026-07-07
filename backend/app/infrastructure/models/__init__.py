@@ -1,3 +1,4 @@
+from app.infrastructure.models.logs import RawLog
 from app.infrastructure.models.iam import (
     Permission,
     Role,
@@ -28,13 +29,14 @@ from app.infrastructure.models.threat_intel import (
 from app.infrastructure.models.system import (
     Asset,
     Notification,
-    AuditLog,
+    AuditTrail,
     Report,
     Playbook,
     SystemSetting,
 )
 
 __all__ = [
+    "RawLog",
     "Permission",
     "Role",
     "User",
@@ -56,7 +58,7 @@ __all__ = [
     "ThreatIntelligence",
     "Asset",
     "Notification",
-    "AuditLog",
+    "AuditTrail",
     "Report",
     "Playbook",
     "SystemSetting",

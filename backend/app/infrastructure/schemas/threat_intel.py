@@ -3,18 +3,25 @@ from typing import Optional, Dict
 from uuid import UUID
 from datetime import datetime
 
-class IOCRecordBase(BaseModel):
-    value: str
-    type: str
-    risk_score: int
+class ThreatIntelligenceBase(BaseModel):
+    title: str
+    source: str
+    external_id: Optional[str] = None
+    content: Optional[Dict] = None
 
-class IOCRecordCreate(IOCRecordBase):
-    description: Optional[str] = None
-    tags: Optional[Dict] = None
+class ThreatIntelligenceCreate(ThreatIntelligenceBase):
+    pass
 
-class IOCRecordResponse(IOCRecordBase):
+class ThreatIntelligenceUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[Dict] = None
+    is_active: Optional[bool] = None
+
+class ThreatIntelligenceResponse(ThreatIntelligenceBase):
     id: UUID
+    is_active: bool
     created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

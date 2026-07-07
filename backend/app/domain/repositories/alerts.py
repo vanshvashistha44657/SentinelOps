@@ -5,13 +5,21 @@ from app.infrastructure.models.alerts import Alert
 
 class AlertRepository(ABC):
     @abstractmethod
-    async def get_by_id(self, id: UUID) -> Optional[Alert]:
+    def get_by_id(self, id: UUID) -> Optional[Alert]:
         pass
 
     @abstractmethod
-    async def create(self, alert_in: dict) -> Alert:
+    def get_unassigned_alerts(self) -> List[Alert]:
         pass
 
     @abstractmethod
-    async def update(self, alert_id: UUID, alert_update: dict) -> Optional[Alert]:
+    def create(self, alert_in: dict) -> Alert:
+        pass
+
+    @abstractmethod
+    def update(self, alert_id: UUID, alert_update: dict) -> Optional[Alert]:
+        pass
+
+    @abstractmethod
+    def link_alert_to_incident(self, alert_id: UUID, incident_id: UUID) -> None:
         pass
