@@ -50,3 +50,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Set up structural foundation for grouping and automated incident creation.
   - Implemented `get_unassigned_alerts` and `link_alert_to_incident` in `AlertRepository`.
   - Implemented `CorrelationService.correlate_alerts` with time-window-based grouping and automated incident creation logic.
+- **Phase 4 (Audit Completion): Complete Audit Logging Integration**:
+  - Completed Audit Logging integration for Case, IOC, Threat Intelligence, and Threat Hunting services, ensuring all critical user actions are logged in the database.
