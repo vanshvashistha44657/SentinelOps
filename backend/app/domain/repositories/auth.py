@@ -3,6 +3,11 @@ from typing import Optional
 from uuid import UUID
 from app.infrastructure.models.auth import RefreshToken
 
+class AuthRepository(ABC):
+    @abstractmethod
+    def dummy(self):
+        pass
+
 class RefreshTokenRepository(ABC):
     @abstractmethod
     def get_by_hash(self, token_hash: str) -> Optional[RefreshToken]:

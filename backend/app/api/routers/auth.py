@@ -6,7 +6,8 @@ from app.application.services.audit import AuditService
 from app.infrastructure.repositories.iam import SQLAlchemyUserRepository
 from app.infrastructure.repositories.auth import SQLAlchemyRefreshTokenRepository
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
-from app.infrastructure.schemas.iam import UserCreate, UserResponse, TokenResponse
+from app.infrastructure.schemas.iam import UserCreate, UserResponse
+from app.infrastructure.schemas.auth import TokenResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
