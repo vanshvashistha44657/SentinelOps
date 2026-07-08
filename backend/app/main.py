@@ -15,6 +15,7 @@ from app.api.routers.cases import router as cases_router
 from app.api.routers.iocs import router as iocs_router
 from app.api.routers.threat_intel import router as threat_intel_router
 from app.api.routers.hunting import router as hunting_router
+from app.api.websocket.router import router as ws_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -49,6 +50,7 @@ app.include_router(cases_router, prefix=settings.API_V1_STR)
 app.include_router(iocs_router, prefix=settings.API_V1_STR)
 app.include_router(threat_intel_router, prefix=settings.API_V1_STR)
 app.include_router(hunting_router, prefix=settings.API_V1_STR)
+app.include_router(ws_router)
 
 
 @app.get("/health", tags=["System"])
