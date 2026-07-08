@@ -1,84 +1,47 @@
 # Installation Guide
 
-This document outlines the local development setup for SentinelOps backend and frontend components.
+This document outlines the setup for SentinelOps on Windows.
 
 ## Prerequisites
 
-- **Python**: version 3.13 or higher
-- **Node.js**: version 18.x or higher (with npm or pnpm)
-- **PostgreSQL**: version 15 or higher
-- **Redis**: version 6 or higher (for caching, Celery task queue, and rate limiting)
-- **Docker**: Optional, but recommended for running external services (DB, Redis)
+- **Docker Desktop** (with WSL 2 integration)
+- **Git**
 
 ---
 
-## Local Development Setup
+## Deployment Setup
 
-### 1. Database and Cache (Using Docker Compose)
+### 1. Run using Docker
 
-In the project root, a Docker Compose file can be used to run PostgreSQL and Redis:
+The easiest way to run the full stack is using Docker Compose:
 
-```bash
-docker-compose -f docker-compose.dev.yml up -d
-```
-
-Alternatively, ensure your local PostgreSQL and Redis servers are running and accessible.
-
-### 2. Backend Installation
-
-1. Navigate to the backend directory:
+1. Clone the repository:
    ```bash
-   cd backend
+   git clone <repo-url>
+   cd sentinelsops
    ```
 
-2. Create and activate a Python virtual environment:
+2. Create `.env` from `.env.example` and fill in necessary secrets:
    ```bash
-   python -m venv .venv
-   # On Windows:
-   .venv\Scripts\activate
-   # On macOS/Linux:
-   source .venv/bin/activate
+   cp backend/.env.example backend/.env
    ```
 
-3. Install requirements:
+3. Launch services:
    ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
+   docker-compose up -d
    ```
+   This will automatically:
+   - Build the backend container.
+   - Start PostgreSQL and Redis.
+   - Run Alembic migrations.
+   - Start the FastAPI application.
 
-4. Configure your environment variables. Copy `.env.example` to `.env` and fill in details:
-   ```bash
-   cp .env.example .env
-   ```
+### 2. Access
 
-5. Run database migrations with Alembic:
-   ```bash
-   alembic upgrade head
-   ```
+- **API**: `http://localhost:8000/api/v1/docs`
 
-6. Launch the FastAPI development server:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+---
 
-### 3. Frontend Installation
+## Local Development (Without Docker)
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd ../frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Configure your environment variables. Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-4. Start the Next.js development server:
-   ```bash
-   npm run dev
-   ```
+*Refer to project README for local development setup if Docker is not used.*
