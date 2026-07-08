@@ -3,10 +3,12 @@ from uuid import UUID
 from app.domain.repositories.iocs import IOCRepository
 from app.infrastructure.schemas.iocs import IOCCreate, IOCUpdate, IOCResponse
 from app.infrastructure.models.threat_intel import IOCRecord
+from app.application.services.audit import AuditService
 
 class IOCService:
-    def __init__(self, ioc_repo: IOCRepository):
+    def __init__(self, ioc_repo: IOCRepository, audit_service: AuditService):
         self.ioc_repo = ioc_repo
+        self.audit_service = audit_service
 
     async def get_ioc(self, ioc_id: UUID) -> Optional[IOCResponse]:
         ioc = self.ioc_repo.get_by_id(ioc_id)
@@ -14,14 +16,19 @@ class IOCService:
             return None
         return IOCResponse.model_validate(ioc)
 
-    async def create_ioc(self, ioc_in: IOCCreate) -> IOCResponse:
+    async def create_ioc(self, ioc_in: IOCCreate, user_id: UUID, ip_address: str) -> IOCResponse:
         ioc = self.ioc_repo.create(ioc_in.model_dump())
+        self.audit_service.log_action(user_id, ip_address, "iocs", "IOC_CREATE", None, {"ioc_id": str(ioc.id)})
         return IOCResponse.model_validate(ioc)
 
-    async def update_ioc(self, ioc_id: UUID, ioc_update: IOCUpdate) -> Optional[IOCResponse]:
+    async def update_ioc(self, ioc_id: UUID, ioc_update: IOCUpdate, user_id: UUID, ip_address: str) -> Optional[IOCResponse]:
+        old_ioc = self.ioc_repo.get_by_id(ioc_id)
+        if not old_ioc:
+            return None
         ioc = self.ioc_repo.update(ioc_id, ioc_update.model_dump(exclude_unset=True))
         if not ioc:
             return None
+        self.audit_service.log_action(user_id, ip_address, "iocs", "IOC_UPDATE", {"value": old_ioc.value}, {"value": ioc.value})
         return IOCResponse.model_validate(ioc)
 
     async def list_iocs(self) -> List[IOCResponse]:
