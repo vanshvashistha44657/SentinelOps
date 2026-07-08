@@ -68,3 +68,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Phase 9: Admin APIs**:
   - Implemented `AdminService` for managing users and system configuration.
   - Exposed admin endpoints in `api/routers/admin.py` with `RBAC` enforcement (`admin:write`).
+- **Phase 10: Background Worker Infrastructure**:
+  - Configured Celery with Redis broker and backend in `backend/app/core/celery_app.py`.
+  - Implemented worker task infrastructure in `backend/app/infrastructure/workers/tasks.py`.
