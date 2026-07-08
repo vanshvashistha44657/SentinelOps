@@ -65,3 +65,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Implemented `ReportService` for managing and generating security reports.
   - Added `SQLAlchemyReportRepository` and domain interfaces.
   - Exposed report management via FastAPI routers in `api/routers/reports.py`.
+- **Phase 9: Admin APIs**:
+  - Implemented `AdminService` for managing users and system configuration.
+  - Exposed admin endpoints in `api/routers/admin.py` with `RBAC` enforcement (`admin:write`).
