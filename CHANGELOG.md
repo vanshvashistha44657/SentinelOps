@@ -55,3 +55,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Phase 5: Centralized Error Handling**:
   - Defined centralized custom exception classes in `backend/app/core/exceptions.py`.
   - Refactored routers (`cases.py`, `iocs.py`) to use domain-specific exceptions, improving error clarity and API consistency.
+- **Phase 6: Schema Validation Enhancement**:
+  - Enhanced Pydantic schema validation across all infrastructure schemas (`alerts.py`, `iocs.py`, `threat_intel.py`, `incidents.py`, `rules.py`) by adding field constraints (`min_length`, `max_length`, `pattern`) to ensure data integrity and security.
