@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Request
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
@@ -10,6 +10,7 @@ from app.infrastructure.repositories.iocs import SQLAlchemyIOCRepository
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
 from app.infrastructure.schemas.iocs import IOCCreate, IOCUpdate, IOCResponse
 from typing import List
+from app.core.exceptions import EntityNotFoundException
 
 router = APIRouter(prefix="/iocs", tags=["IOCs"])
 
@@ -37,7 +38,7 @@ async def get_ioc(
 ):
     ioc = await ioc_service.get_ioc(ioc_id)
     if not ioc:
-        raise HTTPException(status_code=404, detail="IOC not found")
+        raise EntityNotFoundException("IOC", str(ioc_id))
     return ioc
 
 @router.patch("/{ioc_id}", response_model=IOCResponse)
@@ -50,7 +51,7 @@ async def update_ioc(
 ):
     ioc = await ioc_service.update_ioc(ioc_id, ioc_update, current_user.id, request.client.host)
     if not ioc:
-        raise HTTPException(status_code=404, detail="IOC not found")
+        raise EntityNotFoundException("IOC", str(ioc_id))
     return ioc
 
 @router.get("/", response_model=List[IOCResponse])

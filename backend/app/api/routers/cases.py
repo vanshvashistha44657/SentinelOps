@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Request
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
@@ -9,6 +9,7 @@ from app.application.services.audit import AuditService
 from app.infrastructure.repositories.cases import SQLAlchemyCaseRepository
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
 from app.infrastructure.schemas.cases import CaseCreate, CaseUpdate, CaseResponse
+from app.core.exceptions import EntityNotFoundException
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
 
@@ -36,7 +37,7 @@ async def get_case(
 ):
     case = await case_service.get_case(case_id)
     if not case:
-        raise HTTPException(status_code=404, detail="Case not found")
+        raise EntityNotFoundException("Case", str(case_id))
     return case
 
 @router.patch("/{case_id}", response_model=CaseResponse)
@@ -49,5 +50,5 @@ async def update_case(
 ):
     case = await case_service.update_case(case_id, case_update, current_user.id, request.client.host)
     if not case:
-        raise HTTPException(status_code=404, detail="Case not found")
+        raise EntityNotFoundException("Case", str(case_id))
     return case
