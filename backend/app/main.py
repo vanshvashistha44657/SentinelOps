@@ -16,6 +16,7 @@ from app.api.routers.iocs import router as iocs_router
 from app.api.routers.threat_intel import router as threat_intel_router
 from app.api.routers.hunting import router as hunting_router
 from app.api.routers.reports import router as reports_router
+from app.api.routers.assets import router as assets_router
 from app.api.routers.admin import router as admin_router
 from app.api.websocket.router import router as ws_router
 
@@ -53,6 +54,7 @@ app.include_router(iocs_router, prefix=settings.API_V1_STR)
 app.include_router(threat_intel_router, prefix=settings.API_V1_STR)
 app.include_router(hunting_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(assets_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(ws_router)
 

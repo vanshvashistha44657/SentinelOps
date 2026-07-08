@@ -7,6 +7,14 @@ export default function Sidebar() {
         <a href="/alerts" className="block p-2 hover:bg-slate-800 rounded">Alerts</a>
         <a href="/incidents" className="block p-2 hover:bg-slate-800 rounded">Incidents</a>
         <a href="/cases" className="block p-2 hover:bg-slate-800 rounded">Cases</a>
+        <a href="/hunting" className="block p-2 hover:bg-slate-800 rounded">Threat Hunting</a>
+        <a href="/iocs" className="block p-2 hover:bg-slate-800 rounded">IOCs</a>
+        <a href="/threat-intel" className="block p-2 hover:bg-slate-800 rounded">Threat Intel</a>
+        <a href="/assets" className="block p-2 hover:bg-slate-800 rounded">Assets</a>
+        <a href="/reports" className="block p-2 hover:bg-slate-800 rounded">Reports</a>
+        <a href="/admin" className="block p-2 hover:bg-slate-800 rounded">Admin</a>
+        <a href="/profile" className="block p-2 hover:bg-slate-800 rounded">Profile</a>
+        <a href="/settings" className="block p-2 hover:bg-slate-800 rounded">Settings</a>
       </nav>
     </aside>
   );
