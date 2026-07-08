@@ -83,3 +83,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Implemented Alerts, Incidents, and Case Management modules with real backend connectivity.
   - Integrated TanStack Query for efficient data fetching and state management.
   - Built responsive UI components for lists and details views.
+- **Phase 14: Remaining Operational SOC Modules**:
+  - Implemented `Threat Hunting`, `IOC Management`, and `Threat Intelligence` modules with backend connectivity.
+  - Replaced dashboard placeholders with live data using TanStack Query hooks.
+  - Added new pages for operational views and updated sidebar navigation.
