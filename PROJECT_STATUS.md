@@ -28,25 +28,13 @@
 - [x] YAML Rule Loader
 - [x] Alert Service
 
-## Upcoming
-- [x] Phase 1: Authorization & API Security
-- [x] Phase 2: Enterprise Log Ingestion Engine
-- [x] Phase 3: Alert Correlation Engine
-- [x] Phase 4: Incident Management
-- [x] Phase 5: Case Management
-- [x] Phase 6: IOC Management
-- [x] Phase 7: Threat Intelligence
-- [x] Phase 8: Threat Hunting
-- [x] Phase 9: Centralized Error Handling
-- [x] Phase 10: Schema Validation Enhancement
-- [x] Phase 11: WebSocket Notifications
-- [x] Phase 12: Reports
-- [x] Phase 13: Admin APIs
-- [x] Phase 14: Background Workers
-- [ ] Phase 15: Performance
-- [ ] Phase 16: Security Hardening
-- [ ] Phase 17: Docker
-- [ ] Phase 18: CI/CD
-- [ ] Phase 19: Deployment
-- [ ] Phase 20: Final Production Audit
-- [ ] Phase 21: Backend Test Coverage > 90%
+## Frontend Upcoming
+- [x] Phase 11: Frontend Architecture & Dashboard Foundation
+- [x] Phase 12: Authentication & Dashboard Implementation
+- [x] Phase 13: Alerts & Incident Management UI
+- [x] Phase 14: Case & IOC Management UI
+- [ ] Phase 15: Threat Intel & Hunting UI
+- [ ] Phase 16: Reporting & Assets UI
+- [ ] Phase 17: Admin Panel
+- [ ] Phase 18: Live WebSocket Notifications Integration
+- [ ] Phase 19: Final UI/UX Polish

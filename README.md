@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SentinelOps
 
 SentinelOps is a production-quality, enterprise-grade Security Operations Center (SOC) platform designed to simulate real security operations.
@@ -18,23 +17,17 @@ SentinelOps is a production-quality, enterprise-grade Security Operations Center
 
 ## Project Structure
 
-```
+```text
 sentinelsops/
-├── backend/                  # Clean Architecture Backend
+├── backend/
 │   ├── app/
-│   │   ├── api/              # Presentation Layer (Routers, Dependencies)
-│   │   ├── application/      # Application Layer (Services, DTOs, Repository Interfaces)
-│   │   ├── domain/           # Domain Layer (Entities, Value Objects, Domain Services)
-│   │   ├── infrastructure/   # Infrastructure Layer (DB Models, Repositories, Redis, Celery)
-│   │   ├── core/             # Core Configuration, Security & Logging
-│   │   └── utils/            # Utilities
-│   ├── tests/                # Automated Tests
-│   └── alembic/              # Database Migrations
-├── frontend/                 # Next.js Presentation Client
-└── docs/                     # Architectural & API Documentation
-```
-
-Refer to `ARCHITECTURE.md` for architectural design decisions.
-=======
-# SentinelOps
->>>>>>> d594c5e851e372a7089bb4c454f00e5d7decb72e
+│   │   ├── api/
+│   │   ├── application/
+│   │   ├── domain/
+│   │   ├── infrastructure/
+│   │   ├── core/
+│   │   └── utils/
+│   ├── tests/
+│   └── alembic/
+├── frontend/
+└── docs/

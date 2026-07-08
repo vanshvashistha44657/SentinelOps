@@ -71,3 +71,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Phase 10: Background Worker Infrastructure**:
   - Configured Celery with Redis broker and backend in `backend/app/core/celery_app.py`.
   - Implemented worker task infrastructure in `backend/app/infrastructure/workers/tasks.py`.
+- **Phase 11: Frontend Architecture & Dashboard Foundation**:
+  - Initialized Next.js 15 project with TypeScript, Tailwind CSS, and core UI dependencies.
+  - Implemented base layout with dark theme support and dashboard page foundation.
+- **Phase 12: Authentication & Dashboard Implementation**:
+  - Implemented JWT-based authentication with `zustand` for state management and `axios` for API communication.
+  - Created Login page with form validation.
+  - Built responsive `DashboardLayout` with sidebar navigation.
+  - Implemented protected dashboard route with auth guard.
+- **Phase 13: Operational SOC Modules**:
+  - Implemented Alerts, Incidents, and Case Management modules with real backend connectivity.
+  - Integrated TanStack Query for efficient data fetching and state management.
+  - Built responsive UI components for lists and details views.
