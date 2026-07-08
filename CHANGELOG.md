@@ -52,3 +52,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Implemented `CorrelationService.correlate_alerts` with time-window-based grouping and automated incident creation logic.
 - **Phase 4 (Audit Completion): Complete Audit Logging Integration**:
   - Completed Audit Logging integration for Case, IOC, Threat Intelligence, and Threat Hunting services, ensuring all critical user actions are logged in the database.
+- **Phase 5: Centralized Error Handling**:
+  - Defined centralized custom exception classes in `backend/app/core/exceptions.py`.
+  - Refactored routers (`cases.py`, `iocs.py`) to use domain-specific exceptions, improving error clarity and API consistency.
