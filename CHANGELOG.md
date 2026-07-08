@@ -61,3 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Implemented `ConnectionManager` for managing WebSocket connections.
   - Implemented `ws_router` with token-based authentication for real-time notifications.
   - Integrated WebSocket router into FastAPI application.
+- **Phase 8: Reporting Module**:
+  - Implemented `ReportService` for managing and generating security reports.
+  - Added `SQLAlchemyReportRepository` and domain interfaces.
+  - Exposed report management via FastAPI routers in `api/routers/reports.py`.
