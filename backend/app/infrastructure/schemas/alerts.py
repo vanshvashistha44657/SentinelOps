@@ -4,22 +4,22 @@ from uuid import UUID
 from datetime import datetime
 
 class AlertBase(BaseModel):
-    title: str
-    severity: str
+    title: str = Field(..., min_length=3, max_length=100)
+    severity: str = Field(..., pattern="^(LOW|MEDIUM|HIGH|CRITICAL)$")
     confidence_score: int = Field(..., ge=1, le=100)
-    source_ip: Optional[str] = None
-    destination_ip: Optional[str] = None
-    hostname: Optional[str] = None
-    username: Optional[str] = None
+    source_ip: Optional[str] = Field(None, max_length=45)
+    destination_ip: Optional[str] = Field(None, max_length=45)
+    hostname: Optional[str] = Field(None, max_length=255)
+    username: Optional[str] = Field(None, max_length=255)
 
 class AlertCreate(AlertBase):
     raw_event: Dict
     detection_rule_id: Optional[UUID] = None
 
 class AlertUpdate(BaseModel):
-    status: Optional[str] = None
+    status: Optional[str] = Field(None, pattern="^(NEW|OPEN|IN_PROGRESS|RESOLVED|CLOSED)$")
     assigned_user_id: Optional[UUID] = None
-    recommended_response: Optional[str] = None
+    recommended_response: Optional[str] = Field(None, max_length=2000)
 
 class AlertResponse(AlertBase):
     id: UUID

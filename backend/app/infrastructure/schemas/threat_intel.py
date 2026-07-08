@@ -1,19 +1,19 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
 from uuid import UUID
 from datetime import datetime
 
 class ThreatIntelligenceBase(BaseModel):
-    title: str
-    source: str
-    external_id: Optional[str] = None
+    title: str = Field(..., min_length=3, max_length=100)
+    source: str = Field(..., min_length=3, max_length=100)
+    external_id: Optional[str] = Field(None, max_length=100)
     content: Optional[Dict] = None
 
 class ThreatIntelligenceCreate(ThreatIntelligenceBase):
     pass
 
 class ThreatIntelligenceUpdate(BaseModel):
-    title: Optional[str] = None
+    title: Optional[str] = Field(None, min_length=3, max_length=100)
     content: Optional[Dict] = None
     is_active: Optional[bool] = None
 

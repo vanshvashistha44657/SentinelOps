@@ -4,23 +4,23 @@ from uuid import UUID
 from datetime import datetime
 
 class DetectionRuleBase(BaseModel):
-    name: str
-    description: Optional[str] = None
-    severity: str  # CRITICAL, HIGH, MEDIUM, LOW, INFO
+    name: str = Field(..., min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=1000)
+    severity: str = Field(..., pattern="^(CRITICAL|HIGH|MEDIUM|LOW|INFO)$")
     confidence_score: int = Field(..., ge=1, le=100)
     mitre_attack_mapping: Optional[Dict] = None
-    query_logic: str
+    query_logic: str = Field(..., min_length=1)
 
 class DetectionRuleCreate(DetectionRuleBase):
     pass
 
 class DetectionRuleUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    severity: Optional[str] = None
+    name: Optional[str] = Field(None, min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=1000)
+    severity: Optional[str] = Field(None, pattern="^(CRITICAL|HIGH|MEDIUM|LOW|INFO)$")
     confidence_score: Optional[int] = Field(None, ge=1, le=100)
     mitre_attack_mapping: Optional[Dict] = None
-    query_logic: Optional[str] = None
+    query_logic: Optional[str] = Field(None, min_length=1)
     is_active: Optional[bool] = None
 
 class DetectionRuleResponse(DetectionRuleBase):
