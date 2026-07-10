@@ -4,7 +4,7 @@ from app.infrastructure.models.iam import User, Role, Permission
 from app.infrastructure.models.alerts import Alert, DetectionRule
 from app.infrastructure.models.incidents import Incident, Case
 from app.infrastructure.models.threat_intel import IOCRecord, ThreatFeed
-from app.infrastructure.models.system import Asset, AuditLog
+from app.infrastructure.models.system import Asset, AuditTrail
 
 def test_user_creation():
     user_id = uuid.uuid4()

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from sqlalchemy.orm import Session
 from app.domain.repositories.cases import CaseRepository
@@ -10,6 +10,9 @@ class SQLAlchemyCaseRepository(CaseRepository):
 
     def get_by_id(self, id: UUID) -> Optional[Case]:
         return self.db.query(Case).filter(Case.id == id).first()
+
+    def list(self) -> List[Case]:
+        return self.db.query(Case).all()
 
     def create(self, case_in: dict) -> Case:
         case = Case(**case_in)

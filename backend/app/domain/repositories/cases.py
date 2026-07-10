@@ -9,6 +9,10 @@ class CaseRepository(ABC):
         pass
 
     @abstractmethod
+    def list(self) -> List[Case]:
+        pass
+
+    @abstractmethod
     def create(self, case_in: dict) -> Case:
         pass
 

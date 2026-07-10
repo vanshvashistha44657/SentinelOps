@@ -7,6 +7,7 @@ export const useIncidents = () => useQuery({ queryKey: ['incidents'], queryFn: (
 export const useCases = () => useQuery({ queryKey: ['cases'], queryFn: () => api.get('/cases/').then(res => res.data) });
 
 // New Operational Hooks
+export const useDetectionRules = () => useQuery({ queryKey: ['detection-rules'], queryFn: () => api.get('/detection/rules').then(res => res.data) });
 export const useThreatHunting = () => useQuery({ queryKey: ['hunting'], queryFn: () => api.get('/hunting/').then(res => res.data) });
 export const useIOCs = () => useQuery({ queryKey: ['iocs'], queryFn: () => api.get('/iocs/').then(res => res.data) });
 export const useThreatIntel = () => useQuery({ queryKey: ['threat-intel'], queryFn: () => api.get('/threat-intel/').then(res => res.data) });

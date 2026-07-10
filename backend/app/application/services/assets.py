@@ -2,7 +2,7 @@ from typing import Optional, List
 from uuid import UUID
 from app.domain.repositories.assets import AssetRepository
 from app.infrastructure.schemas.assets import AssetCreate, AssetResponse
-from app.infrastructure.models.assets import Asset
+from app.infrastructure.models import Asset
 from app.application.services.audit import AuditService
 
 class AssetService:

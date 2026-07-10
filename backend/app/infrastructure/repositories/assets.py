@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
 from app.domain.repositories.assets import AssetRepository
-from app.infrastructure.models.assets import Asset
+from app.infrastructure.models import Asset
 
 class SQLAlchemyAssetRepository(AssetRepository):
     def __init__(self, db: Session):

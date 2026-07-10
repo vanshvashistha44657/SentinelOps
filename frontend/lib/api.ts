@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
@@ -8,7 +9,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  // This is a bit tricky in Zustand because we are outside of a React component.
+  // We can access the store directly.
+  const token = useAuthStore.getState().token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

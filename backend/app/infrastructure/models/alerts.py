@@ -80,7 +80,7 @@ class Alert(Base, SoftDeleteMixin):
     assigned_user: Mapped[Optional["User"]] = relationship(
         "User", back_populates="assigned_alerts", foreign_keys=[assigned_user_id]
     )
-    asset: Mapped[Optional["Asset"]] = relationship("Asset", back_populates="alerts")
+    asset: Mapped[Optional["Asset"]] = relationship("app.infrastructure.models.system.Asset", back_populates="alerts")
     incidents: Mapped[List["Incident"]] = relationship(
         "Incident", secondary=incident_alerts, back_populates="alerts"
     )

@@ -1,20 +1,43 @@
+import { 
+  LayoutDashboard, AlertTriangle, ShieldAlert, Briefcase, 
+  Search, ShieldCheck, Target, Server, FileText, 
+  Settings, User, Shield 
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+const menuItems = [
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Alerts", href: "/alerts", icon: AlertTriangle },
+  { name: "Incidents", href: "/incidents", icon: ShieldAlert },
+  { name: "Cases", href: "/cases", icon: Briefcase },
+  { name: "Threat Hunting", href: "/hunting", icon: Search },
+  { name: "Detection Rules", href: "/detection", icon: ShieldCheck },
+  { name: "IOC Management", href: "/iocs", icon: Target },
+  { name: "Threat Intelligence", href: "/threat-intel", icon: Shield },
+  { name: "Asset Management", href: "/assets", icon: Server },
+  { name: "Reports", href: "/reports", icon: FileText },
+  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Profile", href: "/profile", icon: User },
+];
+
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-slate-950 border-r border-slate-800 p-4">
-      <h2 className="text-xl font-bold mb-6">SentinelOps</h2>
-      <nav className="space-y-2">
-        <a href="/" className="block p-2 hover:bg-slate-800 rounded">Dashboard</a>
-        <a href="/alerts" className="block p-2 hover:bg-slate-800 rounded">Alerts</a>
-        <a href="/incidents" className="block p-2 hover:bg-slate-800 rounded">Incidents</a>
-        <a href="/cases" className="block p-2 hover:bg-slate-800 rounded">Cases</a>
-        <a href="/hunting" className="block p-2 hover:bg-slate-800 rounded">Threat Hunting</a>
-        <a href="/iocs" className="block p-2 hover:bg-slate-800 rounded">IOCs</a>
-        <a href="/threat-intel" className="block p-2 hover:bg-slate-800 rounded">Threat Intel</a>
-        <a href="/assets" className="block p-2 hover:bg-slate-800 rounded">Assets</a>
-        <a href="/reports" className="block p-2 hover:bg-slate-800 rounded">Reports</a>
-        <a href="/admin" className="block p-2 hover:bg-slate-800 rounded">Admin</a>
-        <a href="/profile" className="block p-2 hover:bg-slate-800 rounded">Profile</a>
-        <a href="/settings" className="block p-2 hover:bg-slate-800 rounded">Settings</a>
+    <aside className="w-64 bg-sidebar border-r border-border p-4 flex flex-col h-screen">
+      <div className="text-xl font-bold mb-8 text-primary">SentinelOps</div>
+      <nav className="space-y-1 flex-1">
+        {menuItems.map((item) => (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 p-3 rounded-md text-text-secondary hover:bg-card hover:text-text-primary transition-colors",
+            )}
+          >
+            <item.icon size={20} />
+            {item.name}
+          </Link>
+        ))}
       </nav>
     </aside>
   );

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+from typing import List
 from app.api.dependencies import get_db
 from app.application.services.alert import AlertService
 from app.infrastructure.schemas.alerts import AlertCreate, AlertResponse
@@ -8,6 +9,12 @@ router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 def get_alert_service(db: Session = Depends(get_db)) -> AlertService:
     return AlertService(db)
+
+@router.get("/", response_model=List[AlertResponse])
+def list_alerts(
+    alert_service: AlertService = Depends(get_alert_service)
+):
+    return alert_service.list_alerts()
 
 @router.post("/ingest", response_model=AlertResponse, status_code=status.HTTP_201_CREATED)
 def ingest_alert(

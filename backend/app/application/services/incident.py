@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from app.domain.repositories.incidents import IncidentRepository
 from app.infrastructure.schemas.incidents import IncidentCreate, IncidentUpdate, IncidentResponse
@@ -9,6 +9,10 @@ class IncidentService:
     def __init__(self, incident_repo: IncidentRepository, audit_service: AuditService):
         self.incident_repo = incident_repo
         self.audit_service = audit_service
+
+    async def list_incidents(self) -> List[IncidentResponse]:
+        incidents = self.incident_repo.list()
+        return [IncidentResponse.model_validate(incident) for incident in incidents]
 
     async def get_incident(self, incident_id: UUID) -> Optional[IncidentResponse]:
         incident = self.incident_repo.get_by_id(incident_id)

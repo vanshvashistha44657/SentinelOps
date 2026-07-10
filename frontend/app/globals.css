@@ -6,5 +6,23 @@
   :root {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    --sidebar: 220 19% 12%;
+    --card: 222.2 47% 11%;
+    --border: 217.2 32.6% 17.5%;
+    --primary: 217.9 91.2% 59.8%;
+    --success: 142.1 76.2% 36.3%;
+    --warning: 38.3 91.3% 60.2%;
+    --critical: 350 89% 60%;
+    --text-primary: 210 40% 98%;
+    --text-secondary: 217.9 10.6% 64.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-text-primary;
   }
 }

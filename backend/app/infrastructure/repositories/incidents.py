@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from sqlalchemy.orm import Session
 from app.domain.repositories.incidents import IncidentRepository
@@ -10,6 +10,9 @@ class SQLAlchemyIncidentRepository(IncidentRepository):
 
     def get_by_id(self, id: UUID) -> Optional[Incident]:
         return self.db.query(Incident).filter(Incident.id == id).first()
+
+    def list(self) -> List[Incident]:
+        return self.db.query(Incident).all()
 
     def create(self, incident_in: dict) -> Incident:
         incident = Incident(**incident_in)

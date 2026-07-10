@@ -9,6 +9,11 @@ services:
       POSTGRES_DB: sentinelsops
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d sentinelsops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:6
@@ -24,8 +29,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY}
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
     ports:
       - "8000:8000"
     command: >

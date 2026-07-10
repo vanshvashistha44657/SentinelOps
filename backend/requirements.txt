@@ -1,0 +1,10 @@
+alembic
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic-settings
+slowapi
+python-jose
+argon2-cffi
+email-validator

@@ -9,6 +9,10 @@ class IncidentRepository(ABC):
         pass
 
     @abstractmethod
+    def list(self) -> List[Incident]:
+        pass
+
+    @abstractmethod
     def create(self, incident_in: dict) -> Incident:
         pass
 

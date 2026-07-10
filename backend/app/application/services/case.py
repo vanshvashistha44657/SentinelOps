@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from app.domain.repositories.cases import CaseRepository
 from app.infrastructure.schemas.cases import CaseCreate, CaseUpdate, CaseResponse
@@ -9,6 +9,10 @@ class CaseService:
     def __init__(self, case_repo: CaseRepository, audit_service: AuditService):
         self.case_repo = case_repo
         self.audit_service = audit_service
+
+    async def list_cases(self) -> List[CaseResponse]:
+        cases = self.case_repo.list()
+        return [CaseResponse.model_validate(case) for case in cases]
 
     async def get_case(self, case_id: UUID) -> Optional[CaseResponse]:
         case = self.case_repo.get_by_id(case_id)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from uuid import UUID
-from app.infrastructure.models.assets import Asset
+from app.infrastructure.models import Asset
 
 class AssetRepository(ABC):
     @abstractmethod

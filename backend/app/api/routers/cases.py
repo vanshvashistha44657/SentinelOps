@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import List
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
 from app.infrastructure.models.iam import User
@@ -20,6 +21,12 @@ def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
 def get_case_service(db: Session = Depends(get_db), audit: AuditService = Depends(get_audit_service)) -> CaseService:
     repo = SQLAlchemyCaseRepository(db)
     return CaseService(repo, audit)
+
+@router.get("/", response_model=List[CaseResponse])
+async def list_cases(
+    case_service: CaseService = Depends(get_case_service)
+):
+    return await case_service.list_cases()
 
 @router.post("/", response_model=CaseResponse, status_code=status.HTTP_201_CREATED)
 async def create_case(

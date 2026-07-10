@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from app.domain.repositories.rules import DetectionRuleRepository
 from app.infrastructure.models.alerts import Alert
 from app.infrastructure.schemas.alerts import AlertCreate, AlertResponse
@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 from app.infrastructure.models.alerts import Alert as AlertModel
 
 class AlertService:
-    def __init__(self, db: Session, audit_service: AuditService):
+    def __init__(self, db: Session):
         self.db = db
-        self.audit_service = audit_service
 
-    def ingest_alert(self, alert_in: AlertCreate, ip_address: str) -> AlertResponse:
+    def list_alerts(self) -> List[AlertModel]:
+        return self.db.query(AlertModel).all()
+
+    def ingest_alert(self, alert_in: AlertCreate, ip_address: str = "0.0.0.0") -> AlertResponse:
         """
         Ingests a raw alert, applies severity/confidence scoring logic,
         and saves it to the database.
@@ -21,5 +23,4 @@ class AlertService:
         self.db.commit()
         self.db.refresh(alert_model)
         
-        self.audit_service.log_action(None, ip_address, "alerts", "ALERT_INGEST", None, {"alert_id": str(alert_model.id)})
         return AlertResponse.model_validate(alert_model)
