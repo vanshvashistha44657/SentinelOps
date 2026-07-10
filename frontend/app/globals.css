@@ -4,25 +4,81 @@
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --sidebar: 220 19% 12%;
-    --card: 222.2 47% 11%;
-    --border: 217.2 32.6% 17.5%;
-    --primary: 217.9 91.2% 59.8%;
-    --success: 142.1 76.2% 36.3%;
-    --warning: 38.3 91.3% 60.2%;
-    --critical: 350 89% 60%;
-    --text-primary: 210 40% 98%;
-    --text-secondary: 217.9 10.6% 64.9%;
+    /* Core Palette - Deep Enterprise Space */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    
+    /* Surface Levels */
+    --surface-0: 240 10% 3.9%;    /* Base Background */
+    --surface-1: 240 10% 7%;     /* Sidebars/Main Areas */
+    --surface-2: 240 10% 12%;    /* Cards/Modals */
+    --surface-3: 240 10% 18%;    /* Hover states/Active items */
+    
+    /* Accents - SOC-Specific */
+    --primary: 217.2 91.2% 59.8%;  /* Sentinel Blue */
+    --accent: 217.2 91.2% 75%;
+    
+    /* Status Colors - High Contrast */
+    --critical: 0 84% 60%;        /* High Alert Red */
+    --warning: 38 92% 50%;        /* Warning Amber */
+    --info: 199 89% 48%;          /* Info Blue */
+    --success: 142 71% 45%;       /* Resolved Green */
+    
+    /* Borders & Dividers */
+    --border: 240 5% 15%;
+    --border-strong: 240 5% 25%;
+    
+    /* Typography */
+    --text-primary: 0 0% 98%;
+    --text-secondary: 240 5% 65%;
+    --text-muted: 240 5% 45%;
+    --text-disabled: 240 5% 30%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    outline-color: hsl(var(--primary));
   }
   body {
-    @apply bg-background text-text-primary;
+    @apply bg-background text-text-primary antialiased font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .soc-card {
+    @apply bg-surface-2 border border-border rounded-lg shadow-sm transition-all duration-200;
+  }
+  .soc-card-header {
+    @apply px-4 py-3 border-b border-border flex items-center justify-between;
+  }
+  .soc-card-content {
+    @apply p-4;
+  }
+  .soc-table {
+    @apply w-full text-sm text-left;
+  }
+  .soc-table-header {
+    @apply bg-surface-1 text-text-secondary font-medium uppercase tracking-wider text-xs py-3 px-4 border-b border-border;
+  }
+  .soc-table-row {
+    @apply border-b border-border hover:bg-surface-3 transition-colors duration-150;
+  }
+  .soc-table-cell {
+    @apply py-3 px-4;
+  }
+  .soc-badge {
+    @apply px-2 py-0.5 rounded text-xs font-medium inline-flex items-center justify-center;
+  }
+  .soc-input {
+    @apply bg-surface-1 border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none;
+  }
+  .soc-btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50;
+  }
+  .soc-btn-secondary {
+    @apply bg-surface-3 text-text-primary px-4 py-2 rounded-md text-sm font-medium hover:bg-surface-3/80 transition-colors border border-border;
   }
 }

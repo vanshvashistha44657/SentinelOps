@@ -29,8 +29,7 @@ class DetectionRuleResponse(DetectionRuleBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 class RuleVersionResponse(BaseModel):
     id: UUID
@@ -41,5 +40,4 @@ class RuleVersionResponse(BaseModel):
     created_at: datetime
     created_by_id: UUID
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
