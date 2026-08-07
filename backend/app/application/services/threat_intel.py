@@ -1,36 +1,51 @@
 from typing import Optional, List
 from uuid import UUID
-from app.domain.repositories.threat_intel import ThreatIntelligenceRepository
-from app.infrastructure.schemas.threat_intel import ThreatIntelligenceCreate, ThreatIntelligenceUpdate, ThreatIntelligenceResponse
-from app.infrastructure.models.threat_intel import ThreatIntelligence
+from sqlalchemy.orm import Session
+from app.infrastructure.models.threat_intel import ThreatIndicator, IOCMatch
+from app.infrastructure.schemas.threat_intel import ThreatIndicatorCreate, ThreatIndicatorUpdate, ThreatIndicatorResponse, IOCMatchResponse
 from app.application.services.audit import AuditService
 
-class ThreatIntelligenceService:
-    def __init__(self, intel_repo: ThreatIntelligenceRepository, audit_service: AuditService):
-        self.intel_repo = intel_repo
+class ThreatIntelService:
+    def __init__(self, db: Session, audit_service: AuditService):
+        self.db = db
         self.audit_service = audit_service
 
-    async def get_threat_intel(self, intel_id: UUID) -> Optional[ThreatIntelligenceResponse]:
-        intel = self.intel_repo.get_by_id(intel_id)
-        if not intel:
-            return None
-        return ThreatIntelligenceResponse.model_validate(intel)
+    # IOC Management
+    def create_indicator(self, indicator_in: ThreatIndicatorCreate, user_id: UUID, ip_address: str) -> ThreatIndicatorResponse:
+        indicator = ThreatIndicator(**indicator_in.model_dump())
+        self.db.add(indicator)
+        self.db.commit()
+        self.db.refresh(indicator)
+        self.audit_service.log_action(user_id, ip_address, "threat_intel", "IOC_CREATE", None, {"indicator_id": str(indicator.id)})
+        return ThreatIndicatorResponse.model_validate(indicator)
 
-    async def create_threat_intel(self, intel_in: ThreatIntelligenceCreate, user_id: UUID, ip_address: str) -> ThreatIntelligenceResponse:
-        intel = self.intel_repo.create(intel_in.model_dump())
-        self.audit_service.log_action(user_id, ip_address, "threat_intel", "THREAT_INTEL_CREATE", None, {"intel_id": str(intel.id)})
-        return ThreatIntelligenceResponse.model_validate(intel)
+    def list_indicators(self) -> List[ThreatIndicatorResponse]:
+        indicators = self.db.query(ThreatIndicator).all()
+        return [ThreatIndicatorResponse.model_validate(i) for i in indicators]
 
-    async def update_threat_intel(self, intel_id: UUID, intel_update: ThreatIntelligenceUpdate, user_id: UUID, ip_address: str) -> Optional[ThreatIntelligenceResponse]:
-        old_intel = self.intel_repo.get_by_id(intel_id)
-        if not old_intel:
+    def update_indicator(self, indicator_id: UUID, update: ThreatIndicatorUpdate, user_id: UUID, ip_address: str) -> Optional[ThreatIndicatorResponse]:
+        indicator = self.db.query(ThreatIndicator).filter(ThreatIndicator.id == indicator_id).first()
+        if not indicator:
             return None
-        intel = self.intel_repo.update(intel_id, intel_update.model_dump(exclude_unset=True))
-        if not intel:
-            return None
-        self.audit_service.log_action(user_id, ip_address, "threat_intel", "THREAT_INTEL_UPDATE", {"value": old_intel.value}, {"value": intel.value})
-        return ThreatIntelligenceResponse.model_validate(intel)
+        
+        for key, value in update.model_dump(exclude_unset=True).items():
+            setattr(indicator, key, value)
+            
+        self.db.commit()
+        self.db.refresh(indicator)
+        self.audit_service.log_action(user_id, ip_address, "threat_intel", "IOC_UPDATE", {"indicator_id": str(indicator_id)}, update.model_dump())
+        return ThreatIndicatorResponse.model_validate(indicator)
 
-    async def list_threat_intel(self) -> List[ThreatIntelligenceResponse]:
-        intel_list = self.intel_repo.list()
-        return [ThreatIntelligenceResponse.model_validate(intel) for intel in intel_list]
+    def delete_indicator(self, indicator_id: UUID, user_id: UUID, ip_address: str) -> bool:
+        indicator = self.db.query(ThreatIndicator).filter(ThreatIndicator.id == indicator_id).first()
+        if not indicator:
+            return False
+        self.db.delete(indicator)
+        self.db.commit()
+        self.audit_service.log_action(user_id, ip_address, "threat_intel", "IOC_DELETE", {"indicator_id": str(indicator_id)}, None)
+        return True
+
+    # Matches
+    def get_matches(self) -> List[IOCMatchResponse]:
+        matches = self.db.query(IOCMatch).all()
+        return [IOCMatchResponse.model_validate(m) for m in matches]

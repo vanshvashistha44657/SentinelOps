@@ -19,3 +19,13 @@ class ThreatHuntingQueryResponse(ThreatHuntingQueryBase):
 
     class Config:
         from_attributes = True
+
+class ThreatHuntingHistoryResponse(BaseModel):
+    id: UUID
+    query: str
+    executed_at: datetime
+    result_count: int
+    user_id: UUID
+
+    class Config:
+        from_attributes = True

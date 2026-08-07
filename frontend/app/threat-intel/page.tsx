@@ -1,6 +1,6 @@
 "use client";
 import DashboardLayout from '@/components/DashboardLayout';
-import { useThreatIntel } from '@/hooks/useData';
+import { useThreatIndicators } from '@/hooks/useData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import {
 } from '@tanstack/react-table';
 
 export default function ThreatIntelPage() {
-  const { data: intel, isLoading } = useThreatIntel();
+  const { data: intel, isLoading } = useThreatIndicators();
 
   const columns = [
     { accessorKey: 'value', header: 'Indicator', cell: ({ row }: any) => <span className="font-mono text-xs">{row.getValue('value')}</span> },

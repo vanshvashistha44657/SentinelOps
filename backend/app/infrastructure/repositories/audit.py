@@ -20,3 +20,6 @@ class SQLAlchemyAuditRepository(AuditRepository):
 
     def list_by_user(self, user_id: UUID) -> List[AuditTrail]:
         return self.db.query(AuditTrail).filter(AuditTrail.user_id == user_id).all()
+
+    def list_all(self) -> List[AuditTrail]:
+        return self.db.query(AuditTrail).order_by(AuditTrail.timestamp.desc()).all()

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from uuid import UUID
 from app.infrastructure.models.incidents import Case
+from app.infrastructure.schemas.cases import CaseFilterParams
 
 class CaseRepository(ABC):
     @abstractmethod
@@ -10,6 +11,15 @@ class CaseRepository(ABC):
 
     @abstractmethod
     def list(self) -> List[Case]:
+        pass
+
+    @abstractmethod
+    def list_paginated(
+        self, 
+        page: int, 
+        size: int, 
+        filters: Optional[CaseFilterParams] = None
+    ) -> Tuple[List[Case], int]:
         pass
 
     @abstractmethod

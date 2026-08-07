@@ -35,7 +35,11 @@ export default function LoginPage() {
         email: values.email,
         password: values.password
       });
-      setAuth(res.data.access_token, res.data.user);
+      // Fetch user profile separately after successful login
+      const userRes = await api.get('/auth/profile', {
+          headers: { Authorization: `Bearer ${res.data.access_token}` }
+      });
+      setAuth(res.data.access_token, userRes.data);
       router.push('/');
     } catch (error) {
       console.error('Login failed', error);

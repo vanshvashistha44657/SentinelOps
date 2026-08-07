@@ -15,3 +15,7 @@ class ThreatHuntingRepository(ABC):
     @abstractmethod
     def list(self) -> List[ThreatHuntingQuery]:
         pass
+
+    @abstractmethod
+    def delete(self, id: UUID) -> None:
+        pass

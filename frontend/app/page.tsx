@@ -3,44 +3,38 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { useAlerts, useIncidents, useCases } from '@/hooks/useData';
+import { useDashboardOverview, useDashboardMetrics, useDashboardCharts, useDashboardTop, useAlerts } from '@/hooks/useData';
 import { KPICard, AlertTrendChart, RecentActivityFeed } from '@/components/dashboard/DashboardWidgets';
 import { AlertTriangle, ShieldAlert, Briefcase, ShieldCheck } from 'lucide-react';
 
 export default function Dashboard() {
   const token = useAuthStore((state) => state.token);
   const router = useRouter();
-  const { data: alerts } = useAlerts();
-  const { data: incidents } = useIncidents();
-  const { data: cases } = useCases();
+  const { data: overview, isLoading: loadingOverview } = useDashboardOverview();
+  const { data: metrics, isLoading: loadingMetrics } = useDashboardMetrics();
+  const { data: charts, isLoading: loadingCharts } = useDashboardCharts();
+  const { data: top, isLoading: loadingTop } = useDashboardTop();
+  const { data: alertsResponse } = useAlerts({ page: 1, size: 8 });
 
   useEffect(() => {
     if (!token) router.push('/login');
   }, [token, router]);
 
   if (!token) return null;
+  if (loadingOverview || loadingMetrics || loadingCharts || loadingTop) return <DashboardLayout>Loading...</DashboardLayout>;
 
   const stats = [
-    { title: "Critical Alerts", value: alerts?.filter((a: any) => a.severity === 'CRITICAL').length || 0, trend: 12, icon: AlertTriangle, variant: "critical" },
-    { title: "Open Incidents", value: incidents?.filter((i: any) => i.status !== 'CLOSED').length || 0, trend: -5, icon: ShieldAlert, variant: "warning" },
-    { title: "Active Cases", value: cases?.filter((c: any) => c.status !== 'CLOSED').length || 0, trend: 8, icon: Briefcase, variant: "info" },
-    { title: "Intel Matches", value: 12, trend: 2, icon: ShieldCheck, variant: "success" },
+    { title: "Critical Alerts", value: overview?.critical_alerts || 0, trend: 12, icon: AlertTriangle, variant: "critical" },
+    { title: "Open Incidents", value: overview?.open_incidents || 0, trend: -5, icon: ShieldAlert, variant: "warning" },
+    { title: "Active Cases", value: overview?.active_cases || 0, trend: 8, icon: Briefcase, variant: "info" },
+    { title: "Cases Closed Today", value: metrics?.cases_closed_today || 0, trend: 2, icon: ShieldCheck, variant: "success" },
   ];
 
-  const trendData = [
-    { name: '00:00', alerts: 12 },
-    { name: '04:00', alerts: 18 },
-    { name: '08:00', alerts: 45 },
-    { name: '12:00', alerts: 32 },
-    { name: '16:00', alerts: 67 },
-    { name: '20:00', alerts: 21 },
-  ];
-
-  const activityFeed = alerts?.slice(0, 8).map((a: any) => ({
+  const activityFeed = alertsResponse?.items.map((a: any) => ({
     title: a.title,
     description: `Source: ${a.source_ip} -> Dest: ${a.destination_ip}`,
     severity: a.severity,
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    timestamp: new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   })) || [];
 
   return (
@@ -50,10 +44,6 @@ export default function Dashboard() {
           <div>
             <h1 className="text-2xl font-bold text-text-primary tracking-tight">Executive Overview</h1>
             <p className="text-text-secondary text-sm">Security posture and real-time threat landscape</p>
-          </div>
-          <div className="flex gap-3">
-            <button className="soc-btn-secondary text-xs">Export Report</button>
-            <button className="soc-btn-primary text-xs">System Refresh</button>
           </div>
         </header>
         
@@ -72,7 +62,7 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <AlertTrendChart data={trendData} />
+            <AlertTrendChart data={charts?.alerts_over_time || []} />
           </div>
           <div className="lg:col-span-1">
             <RecentActivityFeed activities={activityFeed} />

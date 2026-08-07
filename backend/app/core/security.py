@@ -2,10 +2,18 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union, Optional
 from jose import jwt
+import secrets
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import HTTPException, status
 from app.core.config import settings
+
+def create_verification_token() -> str:
+    """
+    Generate a cryptographically secure token.
+    """
+    return secrets.token_urlsafe(32)
+
 
 # Initialize password hasher with production-strength parameters
 ph = PasswordHasher(

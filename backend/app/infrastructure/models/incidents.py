@@ -1,12 +1,45 @@
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID, uuid4
-from sqlalchemy import String, Integer, DateTime, ForeignKey, Text
+from sqlalchemy import String, Integer, DateTime, ForeignKey, Text, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
-from app.infrastructure.models.alerts import incident_alerts
+from app.infrastructure.models.alerts import incident_alerts, Alert
 
 from app.infrastructure.models.mixins import SoftDeleteMixin
+
+# Association Table for Many-to-Many between Cases and MitreTechniques
+case_mitre_techniques = Table(
+    "case_mitre_techniques",
+    Base.metadata,
+    Column("case_id", ForeignKey("cases.id", ondelete="CASCADE"), primary_key=True),
+    Column("mitre_technique_id", ForeignKey("mitre_techniques.id", ondelete="CASCADE"), primary_key=True),
+)
+
+case_alerts = Table(
+    "case_alerts",
+    Base.metadata,
+    Column("case_id", ForeignKey("cases.id", ondelete="CASCADE"), primary_key=True),
+
+    Column("alert_id", ForeignKey("alerts.id", ondelete="CASCADE"), primary_key=True),
+)
+
+case_incidents = Table(
+    "case_incidents",
+    Base.metadata,
+    Column("case_id", ForeignKey("cases.id", ondelete="CASCADE"), primary_key=True),
+    Column("incident_id", ForeignKey("incidents.id", ondelete="CASCADE"), primary_key=True),
+)
+
+class MitreTechnique(Base):
+    __tablename__ = "mitre_techniques"
+    
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    mitre_id: Mapped[str] = mapped_column(String(50), unique=True, index=True) # e.g. T1059
+    name: Mapped[str] = mapped_column(String(255))
+    tactic: Mapped[str] = mapped_column(String(255))
+    
+    cases: Mapped[List["Case"]] = relationship("Case", secondary=case_mitre_techniques, back_populates="mitre_techniques")
 
 class Incident(Base, SoftDeleteMixin):
     __tablename__ = "incidents"
@@ -31,6 +64,7 @@ class Incident(Base, SoftDeleteMixin):
     notes: Mapped[List["AnalystNote"]] = relationship("AnalystNote", back_populates="incident", cascade="all, delete-orphan")
     evidence: Mapped[List["Evidence"]] = relationship("Evidence", back_populates="incident", cascade="all, delete-orphan")
     attachments: Mapped[List["Attachment"]] = relationship("Attachment", back_populates="incident", cascade="all, delete-orphan")
+    linked_cases: Mapped[List["Case"]] = relationship("Case", secondary=case_incidents, back_populates="linked_incidents")
 
 class Case(Base, SoftDeleteMixin):
     __tablename__ = "cases"
@@ -53,6 +87,9 @@ class Case(Base, SoftDeleteMixin):
     notes: Mapped[List["AnalystNote"]] = relationship("CaseNote", back_populates="case", cascade="all, delete-orphan")
     evidence: Mapped[List["Evidence"]] = relationship("Evidence", back_populates="case", cascade="all, delete-orphan")
     attachments: Mapped[List["Attachment"]] = relationship("Attachment", back_populates="case", cascade="all, delete-orphan")
+    mitre_techniques: Mapped[List["MitreTechnique"]] = relationship("MitreTechnique", secondary=case_mitre_techniques, back_populates="cases")
+    linked_alerts: Mapped[List["Alert"]] = relationship("Alert", secondary=case_alerts)
+    linked_incidents: Mapped[List["Incident"]] = relationship("Incident", secondary=case_incidents, back_populates="linked_cases")
 
 class AnalystNote(Base):
     __tablename__ = "analyst_notes"

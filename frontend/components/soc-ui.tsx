@@ -33,10 +33,11 @@ interface TableProps<T> {
   headers: { label: string; accessor: keyof T | string }[];
   data: T[];
   className?: string;
+  onRowClick?: (item: T) => void;
   renderCell?: (item: T, column: string) => React.ReactNode;
 }
 
-export function SOCTable<T>({ headers, data, className, renderCell }: TableProps<T>) {
+export function SOCTable<T>({ headers, data, className, onRowClick, renderCell }: TableProps<T>) {
   return (
     <div className={cn("overflow-x-auto", className)}>
       <table className="soc-table">
@@ -49,7 +50,7 @@ export function SOCTable<T>({ headers, data, className, renderCell }: TableProps
         </thead>
         <tbody>
           {data.map((row, i) => (
-            <tr key={i} className="soc-table-row">
+            <tr key={i} className="soc-table-row" onClick={() => onRowClick?.(row)}>
               {headers.map((h, j) => (
                 <td key={j} className="soc-table-cell">
                   {renderCell ? renderCell(row, h.accessor as string) : (row[h.accessor as keyof T] as React.ReactNode)}
@@ -82,7 +83,7 @@ export const SOCInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttrib
 ));
 SOCInput.displayName = "SOCInput";
 
-export const SOCButton = ({ children, variant = 'primary', className, ...props }: { children: React.ReactNode; variant?: 'primary' | 'secondary'; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+export const SOCButton = ({ children, variant = 'primary', size, className, ...props }: { children: React.ReactNode; variant?: 'primary' | 'secondary'; size?: 'sm' | 'md' | 'xs' | 'lg'; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const variants = {
     primary: "soc-btn-primary",
     secondary: "soc-btn-secondary",

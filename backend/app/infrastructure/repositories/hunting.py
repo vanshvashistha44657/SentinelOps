@@ -20,3 +20,9 @@ class SQLAlchemyThreatHuntingRepository(ThreatHuntingRepository):
 
     def list(self) -> List[ThreatHuntingQuery]:
         return self.db.query(ThreatHuntingQuery).all()
+
+    def delete(self, id: UUID) -> None:
+        query = self.get_by_id(id)
+        if query:
+            self.db.delete(query)
+            self.db.commit()

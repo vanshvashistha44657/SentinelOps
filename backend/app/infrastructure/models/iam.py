@@ -42,6 +42,12 @@ class Role(Base):
 
 from app.infrastructure.models.mixins import SoftDeleteMixin
 
+from app.domain.enums.user import ApprovalStatus
+
+# ... (rest of imports)
+
+# ... (Role, Permission, role_permissions)
+
 class User(Base, SoftDeleteMixin):
     __tablename__ = "users"
     
@@ -50,6 +56,19 @@ class User(Base, SoftDeleteMixin):
     hashed_password: Mapped[str] = mapped_column(String(255))
     full_name: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    
+    # Onboarding Fields
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    email_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    approval_status: Mapped[ApprovalStatus] = mapped_column(String(50), default=ApprovalStatus.PENDING)
+    approved_by: Mapped[Optional[UUID]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    rejected_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    registration_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    registration_device: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    last_login_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    last_login_device: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    
     role_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id", ondelete="RESTRICT"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -61,6 +80,7 @@ class User(Base, SoftDeleteMixin):
     assigned_alerts: Mapped[List["Alert"]] = relationship("Alert", back_populates="assigned_user", foreign_keys="[Alert.assigned_user_id]")
     assigned_incidents: Mapped[List["Incident"]] = relationship("Incident", back_populates="assigned_user", foreign_keys="[Incident.assigned_user_id]")
     assigned_cases: Mapped[List["Case"]] = relationship("Case", back_populates="assigned_user", foreign_keys="[Case.assigned_user_id]")
+
 
 class LoginHistory(Base):
     __tablename__ = "login_history"

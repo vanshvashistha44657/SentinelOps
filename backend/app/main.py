@@ -18,6 +18,8 @@ from app.api.routers.hunting import router as hunting_router
 from app.api.routers.reports import router as reports_router
 from app.api.routers.assets import router as assets_router
 from app.api.routers.admin import router as admin_router
+from app.api.routers.dashboard import router as dashboard_router
+from app.api.routers.simulator import router as simulator_router
 from app.api.websocket.router import router as ws_router
 
 app = FastAPI(
@@ -54,7 +56,10 @@ app.include_router(hunting_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
 app.include_router(assets_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
+app.include_router(dashboard_router, prefix=settings.API_V1_STR)
+app.include_router(simulator_router, prefix=settings.API_V1_STR)
 app.include_router(ws_router)
+
 
 
 @app.get("/health", tags=["System"])

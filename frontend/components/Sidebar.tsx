@@ -1,27 +1,31 @@
 import { 
   LayoutDashboard, AlertTriangle, ShieldAlert, Briefcase, 
   Search, ShieldCheck, Target, Server, FileText, 
-  Settings, User, Shield 
+  Settings, User, Shield, ShieldAlert as AdminIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-const menuItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Alerts", href: "/alerts", icon: AlertTriangle },
-  { name: "Incidents", href: "/incidents", icon: ShieldAlert },
-  { name: "Cases", href: "/cases", icon: Briefcase },
-  { name: "Threat Hunting", href: "/hunting", icon: Search },
-  { name: "Detection Rules", href: "/detection", icon: ShieldCheck },
-  { name: "IOC Management", href: "/iocs", icon: Target },
-  { name: "Threat Intelligence", href: "/threat-intel", icon: Shield },
-  { name: "Asset Management", href: "/assets", icon: Server },
-  { name: "Reports", href: "/reports", icon: FileText },
-  { name: "Settings", href: "/settings", icon: Settings },
-  { name: "Profile", href: "/profile", icon: User },
-];
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Sidebar() {
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role?.name === 'Admin';
+
+  const menuItems = [
+    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Alerts", href: "/alerts", icon: AlertTriangle },
+    { name: "Incidents", href: "/incidents", icon: ShieldAlert },
+    { name: "Cases", href: "/cases", icon: Briefcase },
+    { name: "Threat Hunting", href: "/hunting", icon: Search },
+    { name: "Detection Rules", href: "/detection", icon: ShieldCheck },
+    { name: "Threat Intelligence", href: "/threat-intel", icon: Shield },
+    { name: "Asset Management", href: "/assets", icon: Server },
+    { name: "Reports", href: "/reports", icon: FileText },
+    { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Profile", href: "/profile", icon: User },
+    ...(isAdmin ? [{ name: "Administration", href: "/admin", icon: AdminIcon }] : []),
+  ];
+
   return (
     <aside className="w-64 bg-sidebar border-r border-border p-4 flex flex-col h-screen">
       <div className="text-xl font-bold mb-8 text-primary">SentinelOps</div>

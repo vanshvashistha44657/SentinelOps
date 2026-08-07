@@ -20,9 +20,15 @@ def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
 
 def get_admin_service(db: Session = Depends(get_db), audit: AuditService = Depends(get_audit_service)) -> AdminService:
     repo = SQLAlchemyUserRepository(db)
-    return AdminService(repo, audit)
+    return AdminService(db, repo, audit)
 
-@router.get("/users", response_model=List[UserResponse])
+@router.get("/dashboard/stats", dependencies=[Depends(RBAC("admin:read"))])
+async def get_dashboard_stats(
+    admin_service: AdminService = Depends(get_admin_service)
+):
+    return await admin_service.get_dashboard_stats()
+
+@router.get("/users", response_model=List[UserResponse], dependencies=[Depends(RBAC("admin:read"))])
 async def list_users(
     admin_service: AdminService = Depends(get_admin_service)
 ):
@@ -40,3 +46,35 @@ async def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@router.post("/users/{user_id}/approve", status_code=status.HTTP_204_NO_CONTENT)
+async def approve(
+    request: Request,
+    user_id: UUID,
+    current_user: User = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service)
+):
+    if not await admin_service.approve_user(current_user.id, user_id, request.client.host):
+        raise HTTPException(status_code=404, detail="User not found")
+    return None
+
+@router.post("/users/{user_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
+async def reject(
+    request: Request,
+    user_id: UUID,
+    reason: str,
+    current_user: User = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service)
+):
+    if not await admin_service.reject_user(current_user.id, user_id, reason, request.client.host):
+        raise HTTPException(status_code=404, detail="User not found")
+    return None
+
+@router.get("/audit-logs", dependencies=[Depends(RBAC("admin:read"))])
+async def list_audit_logs(
+    db: Session = Depends(get_db)
+):
+    repo = SQLAlchemyAuditRepository(db)
+    return repo.list_all()
+
+

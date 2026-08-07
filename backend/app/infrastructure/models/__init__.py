@@ -22,9 +22,8 @@ from app.infrastructure.models.incidents import (
     Attachment,
 )
 from app.infrastructure.models.threat_intel import (
-    ThreatFeed,
     IOCRecord,
-    ThreatIntelligence,
+    IOCMatch,
 )
 from app.infrastructure.models.system import (
     Asset,
@@ -53,9 +52,8 @@ __all__ = [
     "AnalystNote",
     "Evidence",
     "Attachment",
-    "ThreatFeed",
     "IOCRecord",
-    "ThreatIntelligence",
+    "IOCMatch",
     "Asset",
     "Notification",
     "AuditTrail",
