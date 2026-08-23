@@ -181,3 +181,6 @@ class AuthService:
         self.audit_service.log_action(user_id, ip_address, "auth", "PASSWORD_CHANGE", None, None)
         return True
 
+    async def heartbeat(self, user_id: UUID) -> None:
+        self.user_repo.update_last_seen(user_id)
+

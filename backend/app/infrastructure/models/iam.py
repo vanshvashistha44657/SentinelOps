@@ -68,6 +68,7 @@ class User(Base, SoftDeleteMixin):
     registration_device: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     last_login_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
     last_login_device: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    last_seen_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     
     role_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id", ondelete="RESTRICT"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

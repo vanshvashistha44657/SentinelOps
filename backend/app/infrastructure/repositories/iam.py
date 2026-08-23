@@ -1,5 +1,6 @@
 from typing import Optional, List
 from uuid import UUID
+from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.domain.repositories.iam import UserRepository, RoleRepository
@@ -19,14 +20,26 @@ class SQLAlchemyUserRepository(UserRepository):
         return self.db.query(User).all()
 
     def create(self, user_in: dict) -> User:
-        print(f"DEBUG: [SQLAlchemyUserRepository] INPUT DATA: {user_in}")
         user = User(**user_in)
-        print(f"DEBUG: [SQLAlchemyUserRepository] MODEL ROLE_ID BEFORE ADD: {user.role_id}")
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
-        print(f"DEBUG: [SQLAlchemyUserRepository] MODEL ROLE_ID AFTER REFRESH: {user.role_id}")
         return user
+
+    def update(self, id: UUID, user_in: dict) -> Optional[User]:
+        user = self.get_by_id(id)
+        if user:
+            for key, value in user_in.items():
+                setattr(user, key, value)
+            self.db.commit()
+            self.db.refresh(user)
+        return user
+
+    def update_last_seen(self, id: UUID) -> None:
+        user = self.get_by_id(id)
+        if user:
+            user.last_seen_at = datetime.utcnow()
+            self.db.commit()
 
 class SQLAlchemyRoleRepository(RoleRepository):
     def __init__(self, db: Session):

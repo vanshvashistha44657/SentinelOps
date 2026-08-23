@@ -20,6 +20,14 @@ class UserRepository(ABC):
     def create(self, user_in: dict) -> User:
         pass
 
+    @abstractmethod
+    def update(self, id: UUID, user_in: dict) -> Optional[User]:
+        pass
+
+    @abstractmethod
+    def update_last_seen(self, id: UUID) -> None:
+        pass
+
 class RoleRepository(ABC):
     @abstractmethod
     def get_by_name(self, name: str) -> Optional[Role]:

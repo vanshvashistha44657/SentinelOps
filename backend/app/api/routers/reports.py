@@ -1,4 +1,9 @@
 from fastapi import APIRouter, Depends, status, Request
+from fastapi.responses import StreamingResponse
+import io
+from openpyxl import Workbook
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
@@ -21,6 +26,48 @@ def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
 def get_report_service(db: Session = Depends(get_db), audit: AuditService = Depends(get_audit_service)) -> ReportService:
     repo = SQLAlchemyReportRepository(db)
     return ReportService(repo, audit)
+
+@router.get("/export/excel")
+async def export_excel(
+    report_service: ReportService = Depends(get_report_service)
+):
+    reports = await report_service.list_reports()
+    wb = Workbook()
+    ws = wb.active
+    ws.append(["ID", "Title", "Created At"])
+    for report in reports:
+        ws.append([str(report.id), report.title, str(report.created_at)])
+    
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=sentinelops-report.xlsx"}
+    )
+
+@router.get("/export/pdf")
+async def export_pdf(
+    report_service: ReportService = Depends(get_report_service)
+):
+    reports = await report_service.list_reports()
+    output = io.BytesIO()
+    c = canvas.Canvas(output, pagesize=letter)
+    c.drawString(100, 750, "SentinelOps Report")
+    y = 700
+    for report in reports:
+        c.drawString(100, y, f"{report.title} - {report.created_at}")
+        y -= 20
+    c.save()
+    output.seek(0)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=sentinelops-report.pdf"}
+    )
 
 @router.post("/", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
 async def create_report(

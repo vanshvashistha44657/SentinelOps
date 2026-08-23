@@ -1,46 +1,45 @@
 "use client";
 import DashboardLayout from '@/components/DashboardLayout';
-import { useAdminUsers } from '@/hooks/useData';
+import { useAdminUsers, useApproveUser, useRejectUser } from '@/hooks/useData';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { UserPlus, ShieldCheck, Key } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserPlus, ShieldCheck, Key, CheckCircle, XCircle } from 'lucide-react';
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  createColumnHelper,
 } from '@tanstack/react-table';
+
+const columnHelper = createColumnHelper<any>();
 
 export default function AdminPage() {
   const { data: users, isLoading } = useAdminUsers();
+  const approveUser = useApproveUser();
+  const rejectUser = useRejectUser();
 
-  const columns = [
-    { accessorKey: 'full_name', header: 'Full Name' },
-    { accessorKey: 'email', header: 'Email' },
-    { accessorKey: 'role', header: 'Role', cell: ({ row }: any) => <Badge variant="outline">{row.getValue('role')}</Badge> },
-    { accessorKey: 'last_login', header: 'Last Login' },
-    { 
-      id: 'actions', 
-      header: 'Actions', 
-      cell: ({ row }: any) => (
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-            <ShieldCheck size={14} /> Permissions
-          </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-            <Key size={14} /> Reset
-          </Button>
-        </div>
-      ) 
-    },
+  const allUsers = users || [];
+  const pendingUsers = allUsers.filter((u: any) => u.approval_status === 'PENDING');
+  const activeUsers = allUsers.filter((u: any) => u.last_seen_at && new Date(u.last_seen_at).getTime() > Date.now() - 300000);
+
+  const commonColumns = [
+    columnHelper.accessor('full_name', { header: 'Full Name' }),
+    columnHelper.accessor('email', { header: 'Email' }),
+    columnHelper.accessor('role', { header: 'Role', cell: (info) => <Badge variant="outline">{info.getValue()}</Badge> }),
+    columnHelper.accessor('approval_status', { header: 'Status' }),
   ];
 
-  const table = useReactTable({
-    data: users || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const activeColumns = [
+    ...commonColumns,
+    columnHelper.accessor('last_seen_at', { header: 'Last Seen', cell: (info) => new Date(info.getValue() as string).toLocaleString() }),
+  ];
+
+  const allTable = useReactTable({ data: allUsers, columns: allUsersColumns, getCoreRowModel: getCoreRowModel() });
+  const pendingTable = useReactTable({ data: pendingUsers, columns: pendingColumns, getCoreRowModel: getCoreRowModel() });
+  const activeTable = useReactTable({ data: activeUsers, columns: activeColumns, getCoreRowModel: getCoreRowModel() });
 
   if (isLoading) return <DashboardLayout>Loading...</DashboardLayout>;
 
@@ -53,32 +52,63 @@ export default function AdminPage() {
         </Button>
       </div>
 
-      <Card className="bg-card border-border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead key={header.id}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">All Users</TabsTrigger>
+          <TabsTrigger value="pending">
+            Pending Approvals ({pendingUsers.length})
+          </TabsTrigger>
+          <TabsTrigger value="active">Active Users ({activeUsers.length})</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all">
+          <Card className="bg-card border-border">
+            <Table>
+              <TableHeader>
+                {allTable.getHeaderGroups().map(hg => (
+                  <TableRow key={hg.id}>{hg.headers.map(h => <TableHead key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}</TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map(row => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map(cell => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+              </TableHeader>
+              <TableBody>
+                {allTable.getRowModel().rows.map(r => (
+                  <TableRow key={r.id}>{r.getVisibleCells().map(c => <TableCell key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</TableCell>)}</TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+        <TabsContent value="pending">
+          <Card className="bg-card border-border">
+            <Table>
+              <TableHeader>
+                {pendingTable.getHeaderGroups().map(hg => (
+                  <TableRow key={hg.id}>{hg.headers.map(h => <TableHead key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}</TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {pendingTable.getRowModel().rows.map(r => (
+                  <TableRow key={r.id}>{r.getVisibleCells().map(c => <TableCell key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</TableCell>)}</TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+        <TabsContent value="active">
+          <Card className="bg-card border-border">
+            <Table>
+              <TableHeader>
+                {activeTable.getHeaderGroups().map(hg => (
+                  <TableRow key={hg.id}>{hg.headers.map(h => <TableHead key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}</TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {activeTable.getRowModel().rows.map(r => (
+                  <TableRow key={r.id}>{r.getVisibleCells().map(c => <TableCell key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</TableCell>)}</TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </DashboardLayout>
   );
 }

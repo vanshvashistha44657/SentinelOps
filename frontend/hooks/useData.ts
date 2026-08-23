@@ -217,10 +217,32 @@ export const useAdminStats = () => useQuery({
   refetchInterval: 60000
 });
 
+export const useAdminUsers = () => useQuery({
+  queryKey: ['admin-users'],
+  queryFn: () => api.get('/admin/users').then(res => res.data)
+});
+
+export const useApproveUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => api.post(`/admin/users/${userId}/approve`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+  });
+};
+
+export const useRejectUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { userId: string, reason: string }) => api.post(`/admin/users/${data.userId}/reject`, null, { params: { reason: data.reason } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+  });
+};
+
 export const useAuditLogs = () => useQuery({
   queryKey: ['admin-audit-logs'],
   queryFn: () => api.get('/admin/audit-logs').then(res => res.data)
 });
+
 
 // Simulator Hooks
 export const useRunAttack = () => {

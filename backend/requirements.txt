@@ -8,3 +8,5 @@ slowapi
 python-jose
 argon2-cffi
 email-validator
+openpyxl
+reportlab

@@ -42,6 +42,14 @@ async def login(
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return token
 
+@router.post("/heartbeat", status_code=status.HTTP_204_NO_CONTENT)
+async def heartbeat(
+    current_user: User = Depends(get_current_user),
+    auth_service: AuthService = Depends(get_auth_service)
+):
+    await auth_service.heartbeat(current_user.id)
+    return None
+
 @router.post("/verify-email", status_code=status.HTTP_204_NO_CONTENT)
 async def verify_email(
     request: Request,
