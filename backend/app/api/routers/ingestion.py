@@ -27,7 +27,7 @@ def get_ingestion_service(db: Session = Depends(get_db), audit: AuditService = D
     detection_service = DetectionService(db, rule_repo)
     return IngestionService(db, log_repo, detection_service)
 
-@router.post("/events", status_code=status.HTTP_201_CREATED)
+@router.post("/events", status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("ingestion:write"))])
 def ingest_event(
     event: dict,
     ingestion_service: IngestionService = Depends(get_ingestion_service)

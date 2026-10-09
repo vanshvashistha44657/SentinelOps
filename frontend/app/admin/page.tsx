@@ -37,6 +37,25 @@ export default function AdminPage() {
     columnHelper.accessor('last_seen_at', { header: 'Last Seen', cell: (info) => new Date(info.getValue() as string).toLocaleString() }),
   ];
 
+  const allUsersColumns = commonColumns;
+  const pendingColumns = [
+    ...commonColumns,
+    columnHelper.display({
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => approveUser.mutate(row.original.id)} disabled={approveUser.isPending}>
+            <CheckCircle size={14} /> Approve
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => rejectUser.mutate({ userId: row.original.id, reason: 'Rejected by administrator' })} disabled={rejectUser.isPending}>
+            <XCircle size={14} /> Reject
+          </Button>
+        </div>
+      ),
+    }),
+  ];
+
   const allTable = useReactTable({ data: allUsers, columns: allUsersColumns, getCoreRowModel: getCoreRowModel() });
   const pendingTable = useReactTable({ data: pendingUsers, columns: pendingColumns, getCoreRowModel: getCoreRowModel() });
   const activeTable = useReactTable({ data: activeUsers, columns: activeColumns, getCoreRowModel: getCoreRowModel() });

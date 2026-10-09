@@ -20,7 +20,7 @@ export default function IOCsPage() {
   const columns = [
     { accessorKey: 'value', header: 'Indicator Value', cell: ({ row }: any) => <span className="font-mono text-xs">{row.getValue('value')}</span> },
     { accessorKey: 'type', header: 'Type', cell: ({ row }: any) => <Badge variant="outline">{row.getValue('type')}</Badge> },
-    { accessorKey: 'confidence', header: 'Confidence', cell: ({ row }: any) => <span className="text-text-secondary">{row.getValue('confidence')}%</span> },
+    { accessorKey: 'risk_score', header: 'Risk score', cell: ({ row }: any) => <span className="text-text-secondary">{row.getValue('risk_score')}%</span> },
     { accessorKey: 'source', header: 'Source' },
     { accessorKey: 'expiration', header: 'Expires' },
   ];

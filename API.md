@@ -40,3 +40,18 @@ The SentinelOps backend exposes a REST API built with FastAPI. All requests and 
 - `GET /ti/iocs`: List and search indicators of compromise.
 - `POST /ti/iocs`: Manually create/add IOC records.
 - `POST /ti/feeds/sync`: Trigger manual update/sync of Threat Intelligence feeds.
+
+### 5. Network Intelligence (`/network`)
+
+- `POST /network/sensor/register`: Administrator-controlled enrollment; returns a one-time key.
+- `POST /network/sensor/data`: Authenticated sensor telemetry submission.
+- `POST /network/admin/sensor/activate/{id}`: Activate a pending sensor.
+- `POST /network/admin/sensor/revoke/{id}`: Revoke a sensor credential.
+- `GET /network/overview`: Current snapshot, sensor freshness, device counts, and visibility limitations.
+- `GET /network/interfaces`: Persisted interface inventory.
+- `GET /network/devices`: Paginated observed device inventory.
+- `GET /network/health`: Persisted gateway/DNS/connectivity measurements.
+- `GET /network/history`: Persisted network snapshots.
+
+Network status labels describe the measurement method and timestamp. A
+neighbor-table observation is limited evidence and is not a complete inventory.

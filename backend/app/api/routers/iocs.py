@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.rbac import RBAC
 from app.infrastructure.models.iam import User
 from app.application.services.ioc import IOCService
 from app.application.services.audit import AuditService
@@ -12,7 +13,7 @@ from app.infrastructure.schemas.iocs import IOCCreate, IOCUpdate, IOCResponse
 from typing import List
 from app.core.exceptions import EntityNotFoundException
 
-router = APIRouter(prefix="/iocs", tags=["IOCs"])
+router = APIRouter(prefix="/iocs", tags=["IOCs"], dependencies=[Depends(RBAC("iocs:view"))])
 
 def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
     repo = SQLAlchemyAuditRepository(db)
@@ -22,7 +23,7 @@ def get_ioc_service(db: Session = Depends(get_db), audit: AuditService = Depends
     repo = SQLAlchemyIOCRepository(db)
     return IOCService(repo, audit)
 
-@router.post("/", response_model=IOCResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=IOCResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("iocs:create"))])
 async def create_ioc(
     ioc_in: IOCCreate,
     request: Request,
@@ -41,7 +42,7 @@ async def get_ioc(
         raise EntityNotFoundException("IOC", str(ioc_id))
     return ioc
 
-@router.patch("/{ioc_id}", response_model=IOCResponse)
+@router.patch("/{ioc_id}", response_model=IOCResponse, dependencies=[Depends(RBAC("iocs:edit"))])
 async def update_ioc(
     ioc_id: UUID,
     ioc_update: IOCUpdate,

@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from uuid import UUID
 from app.api.dependencies import get_db
 from app.core.config import settings
 from app.infrastructure.models.iam import User
@@ -25,7 +26,13 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
         
-    user = SQLAlchemyUserRepository(db).get_by_id(user_id)
-    if user is None:
+    try:
+        user_uuid = UUID(str(user_id))
+    except (ValueError, TypeError):
         raise credentials_exception
+    user = SQLAlchemyUserRepository(db).get_by_id(user_uuid)
+    if user is None or not user.is_active:
+        raise credentials_exception
+    if getattr(user, "approval_status", None) not in (None, "APPROVED"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is not approved")
     return user

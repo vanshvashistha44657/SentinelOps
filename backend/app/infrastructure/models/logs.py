@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID, uuid4
 from sqlalchemy import String, DateTime, JSON, Text, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,11 +9,11 @@ class RawLog(Base):
     __tablename__ = "raw_logs"
     
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    source_connector: Mapped[str] = mapped_column(String(100), index=True)
-    event_type: Mapped[str] = mapped_column(String(100), index=True)
-    severity: Mapped[str] = mapped_column(String(50), index=True)
+    source_connector: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True)
+    event_type: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True)
+    severity: Mapped[Optional[str]] = mapped_column(String(50), index=True, nullable=True)
     
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    timestamp: Mapped[Optional[datetime]] = mapped_column(DateTime, default=datetime.utcnow, index=True, nullable=True)
     source_ip: Mapped[str] = mapped_column(String(45), index=True, nullable=True)
     destination_ip: Mapped[str] = mapped_column(String(45), index=True, nullable=True)
     hostname: Mapped[str] = mapped_column(String(255), index=True, nullable=True)

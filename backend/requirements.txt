@@ -10,3 +10,8 @@ argon2-cffi
 email-validator
 openpyxl
 reportlab
+requests
+celery
+redis
+PyYAML
+httpx

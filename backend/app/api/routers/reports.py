@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.rbac import RBAC
 from app.infrastructure.models.iam import User
 from app.application.services.reports import ReportService
 from app.application.services.audit import AuditService
@@ -17,7 +18,7 @@ from app.infrastructure.schemas.reports import ReportCreate, ReportResponse
 from typing import List
 from app.core.exceptions import EntityNotFoundException
 
-router = APIRouter(prefix="/reports", tags=["Reports"])
+router = APIRouter(prefix="/reports", tags=["Reports"], dependencies=[Depends(RBAC("reports:view"))])
 
 def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
     repo = SQLAlchemyAuditRepository(db)
@@ -29,19 +30,24 @@ def get_report_service(db: Session = Depends(get_db), audit: AuditService = Depe
 
 @router.get("/export/excel")
 async def export_excel(
-    report_service: ReportService = Depends(get_report_service)
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    report_service: ReportService = Depends(get_report_service),
+    audit: AuditService = Depends(get_audit_service),
 ):
     reports = await report_service.list_reports()
     wb = Workbook()
     ws = wb.active
     ws.append(["ID", "Title", "Created At"])
     for report in reports:
-        ws.append([str(report.id), report.title, str(report.created_at)])
+        values = [str(report.id), report.title, str(report.created_at)]
+        ws.append([_safe_spreadsheet_value(value) for value in values])
     
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
     
+    audit.log_action(current_user.id, request.client.host, "reports", "REPORT_EXPORT_EXCEL")
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -50,7 +56,10 @@ async def export_excel(
 
 @router.get("/export/pdf")
 async def export_pdf(
-    report_service: ReportService = Depends(get_report_service)
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    report_service: ReportService = Depends(get_report_service),
+    audit: AuditService = Depends(get_audit_service),
 ):
     reports = await report_service.list_reports()
     output = io.BytesIO()
@@ -63,13 +72,14 @@ async def export_pdf(
     c.save()
     output.seek(0)
     
+    audit.log_action(current_user.id, request.client.host, "reports", "REPORT_EXPORT_PDF")
     return StreamingResponse(
         output,
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=sentinelops-report.pdf"}
     )
 
-@router.post("/", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ReportResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("reports:create"))])
 async def create_report(
     report_in: ReportCreate,
     request: Request,
@@ -90,6 +100,12 @@ async def get_report(
 
 @router.get("/", response_model=List[ReportResponse])
 async def list_reports(
+    current_user: User = Depends(get_current_user),
     report_service: ReportService = Depends(get_report_service)
 ):
     return await report_service.list_reports()
+
+
+def _safe_spreadsheet_value(value):
+    text = str(value)
+    return "'" + text if text[:1] in {"=", "+", "-", "@"} else value

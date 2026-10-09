@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.rbac import RBAC
 from app.infrastructure.models.iam import User
 from app.application.services.assets import AssetService
 from app.application.services.audit import AuditService
@@ -12,7 +13,7 @@ from app.infrastructure.schemas.assets import AssetCreate, AssetResponse
 from typing import List
 from app.core.exceptions import EntityNotFoundException
 
-router = APIRouter(prefix="/assets", tags=["Assets"])
+router = APIRouter(prefix="/assets", tags=["Assets"], dependencies=[Depends(RBAC("assets:view"))])
 
 def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
     repo = SQLAlchemyAuditRepository(db)
@@ -22,7 +23,7 @@ def get_asset_service(db: Session = Depends(get_db), audit: AuditService = Depen
     repo = SQLAlchemyAssetRepository(db)
     return AssetService(repo, audit)
 
-@router.post("/", response_model=AssetResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=AssetResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("assets:create"))])
 async def create_asset(
     asset_in: AssetCreate,
     request: Request,

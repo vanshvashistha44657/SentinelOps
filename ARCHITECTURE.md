@@ -53,3 +53,20 @@ SentinelOps strictly adheres to Clean Architecture principles, decoupling busine
 - **Repository Pattern**: Abstracting the database access allows us to keep the Domain/Application layers clean of SQLAlchemy details and facilitates easy mocking during unit testing.
 - **FastAPI Dependency Injection**: Leveraged for injecting application services, repositories, and authentication contexts directly into route handlers.
 - **Alembic**: Hand-crafted migrations to safely manage schema evolution with zero-downtime constraints.
+
+## Telemetry path
+
+```text
+Authorized host sensor
+  -> bounded Windows/Linux OS collectors
+  -> Pydantic payload validation
+  -> hashed sensor credential authentication
+  -> NetworkService normalization and persistence
+  -> network snapshots, observations, health measurements, and events
+  -> canonical SOC Alert records with evidence
+  -> dashboard, alert investigation, incident response, and reports
+```
+
+Network discovery remains limited to observed neighbor-table evidence. Wider
+coverage requires an explicitly authorized router/AP integration or additional
+sensors.

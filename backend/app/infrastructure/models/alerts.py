@@ -85,3 +85,19 @@ class Alert(Base, SoftDeleteMixin):
         "Incident", secondary=incident_alerts, back_populates="alerts"
     )
     evidence: Mapped[List["Evidence"]] = relationship("Evidence", back_populates="alert")
+    status_history: Mapped[List["AlertStatusHistory"]] = relationship("AlertStatusHistory", back_populates="alert", cascade="all, delete-orphan")
+
+
+class AlertStatusHistory(Base):
+    __tablename__ = "alert_status_history"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    alert_id: Mapped[UUID] = mapped_column(ForeignKey("alerts.id", ondelete="CASCADE"), index=True)
+    changed_by_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    previous_status: Mapped[str] = mapped_column(String(50))
+    new_status: Mapped[str] = mapped_column(String(50))
+    reason: Mapped[Optional[str]] = mapped_column(Text)
+    changed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    alert: Mapped["Alert"] = relationship("Alert", back_populates="status_history")
+    changed_by: Mapped[Optional["User"]] = relationship("User")

@@ -53,7 +53,7 @@ class ThreatHuntingService:
             {
                 "id": str(r.id),
                 "timestamp": r.ingested_at.isoformat(),
-                "event": r.source,
+                "event": r.source_connector,
                 "raw": r.raw_content,
                 "parsed": r.parsed_content
             } for r in results

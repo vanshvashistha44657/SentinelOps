@@ -24,10 +24,10 @@ export default function Dashboard() {
   if (loadingOverview || loadingMetrics || loadingCharts || loadingTop) return <DashboardLayout>Loading...</DashboardLayout>;
 
   const stats = [
-    { title: "Critical Alerts", value: overview?.critical_alerts || 0, trend: 12, icon: AlertTriangle, variant: "critical" },
-    { title: "Open Incidents", value: overview?.open_incidents || 0, trend: -5, icon: ShieldAlert, variant: "warning" },
-    { title: "Active Cases", value: overview?.active_cases || 0, trend: 8, icon: Briefcase, variant: "info" },
-    { title: "Cases Closed Today", value: metrics?.cases_closed_today || 0, trend: 2, icon: ShieldCheck, variant: "success" },
+    { title: "Critical Alerts", value: overview?.critical_alerts || 0, icon: AlertTriangle, variant: "critical" },
+    { title: "Open Incidents", value: overview?.open_incidents || 0, icon: ShieldAlert, variant: "warning" },
+    { title: "Active Cases", value: overview?.active_cases || 0, icon: Briefcase, variant: "info" },
+    { title: "Cases Closed Today", value: metrics?.cases_closed_today || 0, icon: ShieldCheck, variant: "success" },
   ];
 
   const activityFeed = alertsResponse?.items.map((a: any) => ({
@@ -53,9 +53,9 @@ export default function Dashboard() {
               key={stat.title} 
               title={stat.title} 
               value={stat.value} 
-              trend={stat.trend} 
               icon={stat.icon} 
-              variant={stat.variant as any} 
+              variant={stat.variant as any}
+              trend={null}
             />
           ))}
         </div>

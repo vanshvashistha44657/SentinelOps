@@ -41,6 +41,28 @@ class CaseItemService:
         evidence = self.db.query(Evidence).filter(Evidence.case_id == case_id).all()
         return [EvidenceResponse.model_validate(e) for e in evidence]
 
+    def add_incident_note(self, incident_id: UUID, note_in: NoteCreate, author_id: UUID) -> NoteResponse:
+        note = AnalystNote(incident_id=incident_id, content=note_in.content, author_id=author_id)
+        self.db.add(note)
+        self.db.commit()
+        self.db.refresh(note)
+        return NoteResponse.model_validate(note)
+
+    def get_incident_notes(self, incident_id: UUID) -> List[NoteResponse]:
+        notes = self.db.query(AnalystNote).filter(AnalystNote.incident_id == incident_id).order_by(AnalystNote.created_at.asc()).all()
+        return [NoteResponse.model_validate(n) for n in notes]
+
+    def add_incident_evidence(self, incident_id: UUID, evidence_in: EvidenceCreate, user_id: UUID) -> EvidenceResponse:
+        evidence = Evidence(incident_id=incident_id, **evidence_in.model_dump(), added_by_id=user_id)
+        self.db.add(evidence)
+        self.db.commit()
+        self.db.refresh(evidence)
+        return EvidenceResponse.model_validate(evidence)
+
+    def get_incident_evidence(self, incident_id: UUID) -> List[EvidenceResponse]:
+        evidence = self.db.query(Evidence).filter(Evidence.incident_id == incident_id).order_by(Evidence.created_at.asc()).all()
+        return [EvidenceResponse.model_validate(e) for e in evidence]
+
     # Attachments
     def upload_attachment(self, case_id: UUID, file: UploadFile, user_id: UUID) -> Attachment:
         file_path = os.path.join(UPLOAD_DIR, f"{uuid4()}_{file.filename}")
