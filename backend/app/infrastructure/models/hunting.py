@@ -9,7 +9,7 @@ class ThreatHuntingQuery(Base):
     __tablename__ = "threat_hunting_queries"
     
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    name: Mapped[str] = mapped_column(String(255), index=True)
+    name: Mapped[str] = mapped_column(String(255), index=True, unique=True)
     description: Mapped[Optional[str]] = mapped_column(Text)
     query: Mapped[str] = mapped_column(Text)
     creator_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))

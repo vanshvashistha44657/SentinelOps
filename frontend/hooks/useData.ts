@@ -250,3 +250,34 @@ export const useRunAttack = () => {
     mutationFn: (attackType: string) => api.post(`/simulator/attack/${attackType}`),
   });
 };
+
+// Network Intelligence
+export const useNetworkOverview = () => useQuery({
+  queryKey: ['network-overview'],
+  queryFn: () => api.get('/network/overview').then(res => res.data),
+  refetchInterval: 30000,
+});
+
+export const useNetworkDevices = (params: any = {}) => useQuery({
+  queryKey: ['network-devices', params],
+  queryFn: () => api.get('/network/devices', { params }).then(res => res.data),
+  refetchInterval: 30000,
+});
+
+export const useNetworkInterfaces = () => useQuery({
+  queryKey: ['network-interfaces'],
+  queryFn: () => api.get('/network/interfaces').then(res => res.data),
+  refetchInterval: 30000,
+});
+
+export const useNetworkHealth = () => useQuery({
+  queryKey: ['network-health'],
+  queryFn: () => api.get('/network/health').then(res => res.data),
+  refetchInterval: 30000,
+});
+
+export const useNetworkHistory = () => useQuery({
+  queryKey: ['network-history'],
+  queryFn: () => api.get('/network/history').then(res => res.data),
+  refetchInterval: 60000,
+});

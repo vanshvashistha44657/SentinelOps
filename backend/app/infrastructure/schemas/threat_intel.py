@@ -4,12 +4,12 @@ from uuid import UUID
 from datetime import datetime
 
 class ThreatIndicatorBase(BaseModel):
-    type: str
-    value: str
-    confidence: int = 50
-    severity: str
-    source: str
-    description: Optional[str] = None
+    type: str = Field(..., min_length=2, max_length=50)
+    value: str = Field(..., min_length=1, max_length=512)
+    risk_score: int = Field(50, ge=0, le=100)
+    severity: str = Field("MEDIUM", pattern="^(CRITICAL|HIGH|MEDIUM|LOW|INFO)$")
+    source: str = Field("manual", min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=2000)
     tags: Optional[Dict] = None
     tlp: str = "WHITE"
     expires_at: Optional[datetime] = None
@@ -19,7 +19,7 @@ class ThreatIndicatorCreate(ThreatIndicatorBase):
     pass
 
 class ThreatIndicatorUpdate(BaseModel):
-    confidence: Optional[int] = None
+    risk_score: Optional[int] = Field(None, ge=0, le=100)
     severity: Optional[str] = None
     description: Optional[str] = None
     tags: Optional[Dict] = None

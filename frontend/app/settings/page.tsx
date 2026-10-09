@@ -1,4 +1,5 @@
 "use client";
+import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,14 +8,22 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Save, Bell, Shield, User } from 'lucide-react';
+import api from '@/lib/api';
 
 export default function SettingsPage() {
   const { user, setAuth } = useAuthStore();
+  const [fullName, setFullName] = useState(user?.full_name || '');
+  const [message, setMessage] = useState<string | null>(null);
   
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implementation would connect to /profile/update API
-    console.log('Profile updated');
+    try {
+      const response = await api.patch('/auth/profile', { full_name: fullName });
+      setAuth(useAuthStore.getState().token || '', response.data);
+      setMessage('Profile saved.');
+    } catch {
+      setMessage('Profile could not be saved.');
+    }
   };
 
   return (
@@ -47,7 +56,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Full Name</Label>
-                    <Input defaultValue={user?.full_name} placeholder="John Doe" />
+                    <Input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="John Doe" />
                   </div>
                   <div className="space-y-2">
                     <Label>Email Address</Label>
@@ -61,6 +70,7 @@ export default function SettingsPage() {
                 <Button type="submit" className="flex items-center gap-2">
                   <Save size={16} /> Save Changes
                 </Button>
+                {message && <p className="text-sm text-text-secondary">{message}</p>}
               </form>
             </CardContent>
           </Card>

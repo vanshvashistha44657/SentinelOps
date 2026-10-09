@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Request
+from sqlalchemy import text
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
+from app.core.database import engine
 from app.core.limiter import limiter
 from app.api.middleware.security_headers import SecurityHeadersMiddleware
 from app.api.routers.auth import router as auth_router
@@ -20,6 +22,7 @@ from app.api.routers.assets import router as assets_router
 from app.api.routers.admin import router as admin_router
 from app.api.routers.dashboard import router as dashboard_router
 from app.api.routers.simulator import router as simulator_router
+from app.api.routers.network import router as network_router
 from app.api.websocket.router import router as ws_router
 
 app = FastAPI(
@@ -33,18 +36,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=[
-        "localhost",
-        "127.0.0.1",
-    ],
+    allowed_hosts=settings.trusted_hosts,
 )
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,10 +62,16 @@ app.include_router(assets_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(dashboard_router, prefix=settings.API_V1_STR)
 app.include_router(simulator_router, prefix=settings.API_V1_STR)
+app.include_router(network_router, prefix=settings.API_V1_STR)
 app.include_router(ws_router)
 
 
 
 @app.get("/health", tags=["System"])
 def health_check():
-    return {"status": "healthy"}
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        return {"status": "healthy", "database": "healthy"}
+    except Exception:
+        return {"status": "degraded", "database": "unavailable"}

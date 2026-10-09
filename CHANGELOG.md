@@ -4,6 +4,20 @@ All notable changes to the SentinelOps project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Network intelligence and reliability
+
+### Added
+- Persistent authorized host network snapshots, interfaces, device observations, health measurements, and sensor metadata.
+- Windows-first bounded network sensor collectors with graceful unavailable-data handling.
+- Administrator-controlled sensor enrollment, activation, hashed credentials, and revocation.
+- Canonical SOC alerts for new devices, IP/MAC changes, gateway/DNS changes, degraded checks, and stale telemetry.
+- Alert status history, case/incident notes and evidence endpoints, and real-data dashboard/report views.
+
+### Fixed
+- Restored the generic detection service contract used by ingestion, simulator, and rule routes.
+- Replaced destructive onboarding/network migration behavior with additive, idempotent migrations.
+- Added frontend environment-based API configuration and fixed admin TypeScript compilation errors.
+
 ## [0.1.0] - 2026-07-07
 
 ### Added

@@ -7,7 +7,7 @@ import { Activity, ShieldAlert, AlertTriangle, ShieldCheck } from 'lucide-react'
 interface KPIProps {
   title: string;
   value: string | number;
-  trend: number;
+  trend?: number | null;
   icon: React.ElementType;
   variant: 'critical' | 'warning' | 'info' | 'success';
 }
@@ -27,9 +27,9 @@ export const KPICard = ({ title, value, trend, icon: Icon, variant }: KPIProps) 
         <div>
           <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">{title}</p>
           <div className="text-3xl font-bold text-text-primary">{value}</div>
-          <div className={cn("text-xs mt-2 flex items-center gap-1", trend > 0 ? "text-critical" : "text-success")}>
+          {trend === undefined || trend === null ? <div className="text-xs mt-2 text-text-muted">Trend unavailable</div> : <div className={cn("text-xs mt-2 flex items-center gap-1", trend > 0 ? "text-critical" : "text-success")}>
             {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}% <span className="text-text-muted">vs last 24h</span>
-          </div>
+          </div>}
         </div>
         <div className={cn("p-3 rounded-lg bg-surface-3 group-hover:scale-110 transition-transform", variants[variant])}>
           <Icon size={24} />

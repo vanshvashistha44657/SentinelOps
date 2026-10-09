@@ -75,3 +75,33 @@ async def update_case(
         raise EntityNotFoundException("Case", str(case_id))
     audit.log_action(current_user.id, request.client.host, "cases", "CASE_UPDATE", {"id": str(case_id)}, case_update.model_dump())
     return case
+
+
+@router.get("/{case_id}/notes", response_model=List[NoteResponse], dependencies=[Depends(RBAC("cases:view"))])
+async def get_case_notes(case_id: UUID, case_items: CaseItemService = Depends(get_case_item_service)):
+    return case_items.get_notes(case_id)
+
+
+@router.post("/{case_id}/notes", response_model=NoteResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("cases:edit"))])
+async def add_case_note(
+    case_id: UUID,
+    note: NoteCreate,
+    current_user: User = Depends(get_current_user),
+    case_items: CaseItemService = Depends(get_case_item_service),
+):
+    return case_items.add_note(case_id, note, current_user.id)
+
+
+@router.get("/{case_id}/evidence", response_model=List[EvidenceResponse], dependencies=[Depends(RBAC("cases:view"))])
+async def get_case_evidence(case_id: UUID, case_items: CaseItemService = Depends(get_case_item_service)):
+    return case_items.get_evidence(case_id)
+
+
+@router.post("/{case_id}/evidence", response_model=EvidenceResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("cases:edit"))])
+async def add_case_evidence(
+    case_id: UUID,
+    evidence: EvidenceCreate,
+    current_user: User = Depends(get_current_user),
+    case_items: CaseItemService = Depends(get_case_item_service),
+):
+    return case_items.add_evidence(case_id, evidence, current_user.id)

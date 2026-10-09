@@ -31,7 +31,7 @@ export default function AssetsPage() {
   ];
 
   const table = useReactTable({
-    data: assets || [],
+    data: (assets || []).filter((asset: any) => !searchQuery || [asset.name, asset.ip_address, asset.os].filter(Boolean).join(' ').toLowerCase().includes(searchQuery.toLowerCase())),
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

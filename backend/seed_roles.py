@@ -19,7 +19,13 @@ def seed_data():
         "incidents:view", "incidents:create", "incidents:edit",
         "cases:view", "cases:create", "cases:edit", "cases:close",
         "hunting:search", "hunting:save",
-        "admin:write", "admin:read"
+        "ingestion:view", "ingestion:delete",
+        "ingestion:write", "detection:view", "detection:write",
+        "threat_intel:view", "threat_intel:create", "threat_intel:edit", "threat_intel:delete",
+        "assets:view", "assets:create", "reports:view", "reports:create",
+        "iocs:view", "iocs:create", "iocs:edit",
+        "admin:write", "admin:read",
+        "network:view", "network:write"
     ]
     
     # Create Permissions
@@ -34,7 +40,7 @@ def seed_data():
     # Create Roles and map permissions
     roles_config = {
         "Administrator": permission_list,
-        "SOC Analyst": ["dashboard:view", "alerts:view", "incidents:view", "cases:view", "hunting:search"],
+        "SOC Analyst": ["dashboard:view", "assets:view", "reports:view", "iocs:view", "alerts:view", "alerts:edit", "incidents:view", "incidents:edit", "cases:view", "cases:edit", "hunting:search", "network:view", "threat_intel:view", "ingestion:view"],
     }
     
     for role_name, permissions in roles_config.items():

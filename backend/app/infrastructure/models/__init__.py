@@ -7,11 +7,12 @@ from app.infrastructure.models.iam import (
     APIKey,
     role_permissions,
 )
-from app.infrastructure.models.auth import RefreshToken
+from app.infrastructure.models.auth import RefreshToken, EmailVerificationToken
 from app.infrastructure.models.alerts import (
     DetectionRule,
     RuleVersion,
     Alert,
+    AlertStatusHistory,
     incident_alerts,
 )
 from app.infrastructure.models.incidents import (
@@ -33,6 +34,17 @@ from app.infrastructure.models.system import (
     Playbook,
     SystemSetting,
 )
+from app.infrastructure.models.network import (
+    NetworkDevice,
+    NetworkEvent,
+    NetworkInterface,
+    NetworkSnapshot,
+    NetworkDeviceObservation,
+    NetworkHealthMeasurement,
+)
+from app.infrastructure.models.network_sensor import NetworkSensor
+from app.infrastructure.models.network_alerts import SecurityAlert
+from app.infrastructure.models.hunting import ThreatHuntingQuery, ThreatHuntingHistory
 
 __all__ = [
     "RawLog",
@@ -42,10 +54,12 @@ __all__ = [
     "LoginHistory",
     "APIKey",
     "RefreshToken",
+    "EmailVerificationToken",
     "role_permissions",
     "DetectionRule",
     "RuleVersion",
     "Alert",
+    "AlertStatusHistory",
     "incident_alerts",
     "Incident",
     "Case",
@@ -60,4 +74,14 @@ __all__ = [
     "Report",
     "Playbook",
     "SystemSetting",
+    "NetworkDevice",
+    "NetworkEvent",
+    "NetworkInterface",
+    "NetworkSnapshot",
+    "NetworkDeviceObservation",
+    "NetworkHealthMeasurement",
+    "NetworkSensor",
+    "SecurityAlert",
+    "ThreatHuntingQuery",
+    "ThreatHuntingHistory",
 ]

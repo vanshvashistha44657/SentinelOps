@@ -18,7 +18,7 @@ export default function ThreatIntelPage() {
     { accessorKey: 'value', header: 'Indicator', cell: ({ row }: any) => <span className="font-mono text-xs">{row.getValue('value')}</span> },
     { accessorKey: 'type', header: 'Type', cell: ({ row }: any) => <Badge variant="outline">{row.getValue('type')}</Badge> },
     { accessorKey: 'source', header: 'Source' },
-    { accessorKey: 'confidence', header: 'Confidence', cell: ({ row }: any) => <span className="text-text-secondary">{row.getValue('confidence')}%</span> },
+    { accessorKey: 'risk_score', header: 'Risk score', cell: ({ row }: any) => <span className="text-text-secondary">{row.getValue('risk_score')}%</span> },
   ];
 
   const table = useReactTable({
@@ -30,10 +30,10 @@ export default function ThreatIntelPage() {
   if (isLoading) return <DashboardLayout>Loading...</DashboardLayout>;
 
   const summary = [
-    { title: "Active Campaigns", value: "12", icon: Globe, color: "text-primary" },
-    { title: "APT Groups", value: "8", icon: ShieldAlert, color: "text-warning" },
-    { title: "Malware Families", value: "45", icon: Bug, color: "text-critical" },
-    { title: "Threat Feeds", value: "24", icon: Activity, color: "text-success" },
+    { title: "Indicators", value: String(intel?.length || 0), icon: Globe, color: "text-primary" },
+    { title: "High severity", value: String(intel?.filter((item: any) => ["HIGH", "CRITICAL"].includes(item.severity)).length || 0), icon: ShieldAlert, color: "text-warning" },
+    { title: "Enabled", value: String(intel?.filter((item: any) => item.enabled).length || 0), icon: Bug, color: "text-critical" },
+    { title: "Sources", value: String(new Set((intel || []).map((item: any) => item.source)).size), icon: Activity, color: "text-success" },
   ];
 
   return (

@@ -58,9 +58,9 @@ class User(Base, SoftDeleteMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     
     # Onboarding Fields
-    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    email_verified: Mapped[Optional[bool]] = mapped_column(Boolean, default=False, nullable=True)
     email_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    approval_status: Mapped[ApprovalStatus] = mapped_column(String(50), default=ApprovalStatus.PENDING)
+    approval_status: Mapped[Optional[ApprovalStatus]] = mapped_column(String(50), default=ApprovalStatus.PENDING, nullable=True)
     approved_by: Mapped[Optional[UUID]] = mapped_column(ForeignKey("users.id"), nullable=True)
     approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     rejected_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)

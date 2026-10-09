@@ -9,7 +9,7 @@ from app.infrastructure.models.iam import User
 from app.application.services.alert import AlertService
 from app.application.services.audit import AuditService
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
-from app.infrastructure.schemas.alerts import AlertCreate, AlertResponse, AlertUpdate, PaginatedAlertResponse, AlertFilterParams, AlertSeverity, AlertStatus
+from app.infrastructure.schemas.alerts import AlertCreate, AlertResponse, AlertUpdate, PaginatedAlertResponse, AlertFilterParams, AlertSeverity, AlertStatus, AlertStatusHistoryResponse
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
@@ -32,6 +32,21 @@ def list_alerts(
     filters = AlertFilterParams(severity=severity, status=status, source_ip=source_ip)
     return alert_service.list_alerts(page=page, size=size, filters=filters)
 
+
+@router.get("/{alert_id}", response_model=AlertResponse, dependencies=[Depends(RBAC("alerts:view"))])
+def get_alert(alert_id: UUID, alert_service: AlertService = Depends(get_alert_service)):
+    alert = alert_service.get_alert(alert_id)
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return alert
+
+
+@router.get("/{alert_id}/history", response_model=list[AlertStatusHistoryResponse], dependencies=[Depends(RBAC("alerts:view"))])
+def get_alert_history(alert_id: UUID, alert_service: AlertService = Depends(get_alert_service)):
+    if not alert_service.get_alert(alert_id):
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return alert_service.list_status_history(alert_id)
+
 @router.post("/ingest", response_model=AlertResponse, status_code=status.HTTP_201_CREATED)
 def ingest_alert(
     alert_in: AlertCreate,
@@ -49,7 +64,7 @@ def update_alert(
     alert_service: AlertService = Depends(get_alert_service),
     audit: AuditService = Depends(get_audit_service)
 ):
-    alert = alert_service.update_alert(alert_id, alert_update)
+    alert = alert_service.update_alert(alert_id, alert_update, current_user.id)
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
     audit.log_action(current_user.id, request.client.host, "alerts", "ALERT_UPDATE", {"id": str(alert_id)}, alert_update.model_dump())

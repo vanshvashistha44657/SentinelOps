@@ -1,5 +1,5 @@
 from typing import Optional, List
-from app.infrastructure.models.alerts import Alert as AlertModel
+from app.infrastructure.models.alerts import Alert as AlertModel, AlertStatusHistory
 from app.infrastructure.schemas.alerts import AlertCreate, AlertUpdate, AlertResponse, AlertFilterParams, PaginatedAlertResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, and_
@@ -42,17 +42,32 @@ class AlertService:
     def get_alert(self, alert_id: UUID) -> Optional[AlertModel]:
         return self.db.query(AlertModel).filter(AlertModel.id == alert_id).first()
 
-    def update_alert(self, alert_id: UUID, alert_update: AlertUpdate) -> Optional[AlertResponse]:
+    def update_alert(self, alert_id: UUID, alert_update: AlertUpdate, changed_by_id: Optional[UUID] = None) -> Optional[AlertResponse]:
         alert = self.get_alert(alert_id)
         if not alert:
             return None
         
-        for key, value in alert_update.model_dump(exclude_unset=True).items():
+        old_status = alert.status
+        update_data = alert_update.model_dump(exclude_unset=True)
+        reason = update_data.pop("reason", None)
+        for key, value in update_data.items():
             setattr(alert, key, value)
+
+        if alert.status != old_status:
+            self.db.add(AlertStatusHistory(
+                alert_id=alert.id,
+                changed_by_id=changed_by_id,
+                previous_status=str(old_status),
+                new_status=str(alert.status),
+                reason=reason,
+            ))
             
         self.db.commit()
         self.db.refresh(alert)
         return AlertResponse.model_validate(alert)
+
+    def list_status_history(self, alert_id: UUID):
+        return self.db.query(AlertStatusHistory).filter(AlertStatusHistory.alert_id == alert_id).order_by(AlertStatusHistory.changed_at.asc()).all()
 
     def delete_alert(self, alert_id: UUID) -> bool:
         alert = self.get_alert(alert_id)

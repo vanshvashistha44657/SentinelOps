@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_db
 from app.application.services.dashboard import DashboardService
+from app.api.dependencies.rbac import RBAC
 
-router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+router = APIRouter(prefix="/dashboard", tags=["Dashboard"], dependencies=[Depends(RBAC("dashboard:view"))])
 
 def get_dashboard_service(db: Session = Depends(get_db)) -> DashboardService:
     return DashboardService(db)

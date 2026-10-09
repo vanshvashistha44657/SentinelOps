@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Request, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.rbac import RBAC
@@ -11,6 +11,8 @@ from app.application.services.audit import AuditService
 from app.infrastructure.repositories.incidents import SQLAlchemyIncidentRepository
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
 from app.infrastructure.schemas.incidents import IncidentCreate, IncidentUpdate, IncidentResponse, PaginatedIncidentResponse, IncidentFilterParams, IncidentSeverity, IncidentStatus
+from app.application.services.case_items import CaseItemService
+from app.infrastructure.schemas.case_items import NoteCreate, NoteResponse, EvidenceCreate, EvidenceResponse
 
 router = APIRouter(prefix="/incidents", tags=["Incidents"])
 
@@ -21,6 +23,9 @@ def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
 def get_incident_service(db: Session = Depends(get_db), audit: AuditService = Depends(get_audit_service)) -> IncidentService:
     repo = SQLAlchemyIncidentRepository(db)
     return IncidentService(repo, audit)
+
+def get_case_item_service(db: Session = Depends(get_db)) -> CaseItemService:
+    return CaseItemService(db)
 
 @router.get("/", response_model=PaginatedIncidentResponse, dependencies=[Depends(RBAC("incidents:view"))])
 async def list_incidents(
@@ -69,3 +74,33 @@ async def update_incident(
         raise HTTPException(status_code=404, detail="Incident not found")
     audit.log_action(current_user.id, request.client.host, "incidents", "INCIDENT_UPDATE", {"id": str(incident_id)}, incident_update.model_dump())
     return incident
+
+
+@router.get("/{incident_id}/notes", response_model=List[NoteResponse], dependencies=[Depends(RBAC("incidents:view"))])
+async def get_incident_notes(incident_id: UUID, case_items: CaseItemService = Depends(get_case_item_service)):
+    return case_items.get_incident_notes(incident_id)
+
+
+@router.post("/{incident_id}/notes", response_model=NoteResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("incidents:edit"))])
+async def add_incident_note(
+    incident_id: UUID,
+    note: NoteCreate,
+    current_user: User = Depends(get_current_user),
+    case_items: CaseItemService = Depends(get_case_item_service),
+):
+    return case_items.add_incident_note(incident_id, note, current_user.id)
+
+
+@router.get("/{incident_id}/evidence", response_model=List[EvidenceResponse], dependencies=[Depends(RBAC("incidents:view"))])
+async def get_incident_evidence(incident_id: UUID, case_items: CaseItemService = Depends(get_case_item_service)):
+    return case_items.get_incident_evidence(incident_id)
+
+
+@router.post("/{incident_id}/evidence", response_model=EvidenceResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("incidents:edit"))])
+async def add_incident_evidence(
+    incident_id: UUID,
+    evidence: EvidenceCreate,
+    current_user: User = Depends(get_current_user),
+    case_items: CaseItemService = Depends(get_case_item_service),
+):
+    return case_items.add_incident_evidence(incident_id, evidence, current_user.id)

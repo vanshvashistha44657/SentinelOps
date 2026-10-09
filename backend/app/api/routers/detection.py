@@ -6,14 +6,15 @@ from app.api.dependencies import get_db
 from app.application.services.detection import DetectionService
 from app.infrastructure.repositories.rules import SQLAlchemyDetectionRuleRepository
 from app.infrastructure.schemas.rules import DetectionRuleCreate, DetectionRuleResponse
+from app.api.dependencies.rbac import RBAC
 
-router = APIRouter(prefix="/detection/rules", tags=["Detection Rules"])
+router = APIRouter(prefix="/detection/rules", tags=["Detection Rules"], dependencies=[Depends(RBAC("detection:view"))])
 
 def get_detection_service(db: Session = Depends(get_db)) -> DetectionService:
     rule_repo = SQLAlchemyDetectionRuleRepository(db)
     return DetectionService(rule_repo)
 
-@router.post("/", response_model=DetectionRuleResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=DetectionRuleResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RBAC("detection:write"))])
 def create_rule(
     rule_in: DetectionRuleCreate,
     detection_service: DetectionService = Depends(get_detection_service)

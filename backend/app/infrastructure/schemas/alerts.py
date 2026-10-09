@@ -34,12 +34,15 @@ class AlertUpdate(BaseModel):
     status: Optional[AlertStatus] = None
     assigned_user_id: Optional[UUID] = None
     recommended_response: Optional[str] = Field(None, max_length=2000)
+    reason: Optional[str] = Field(None, max_length=1000)
 
 class AlertResponse(AlertBase):
     id: UUID
     status: AlertStatus
     mitre_attack_mapping: Optional[Dict] = None
+    raw_event: Dict = Field(default_factory=dict)
     created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -56,3 +59,15 @@ class PaginatedAlertResponse(BaseModel):
     total: int
     page: int
     size: int
+
+
+class AlertStatusHistoryResponse(BaseModel):
+    id: UUID
+    alert_id: UUID
+    changed_by_id: Optional[UUID] = None
+    previous_status: str
+    new_status: str
+    reason: Optional[str] = None
+    changed_at: datetime
+
+    model_config = {"from_attributes": True}
