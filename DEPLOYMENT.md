@@ -36,7 +36,7 @@ Internet / Clients
 
 A local/staging `docker-compose.yml` configures the API, PostgreSQL, and Redis:
 
-- **backend**: Runs Alembic and the FastAPI application.
+- **backend**: Runs the FastAPI application; Alembic is an explicit maintenance step.
 - **db**: PostgreSQL with a named local volume and healthcheck.
 - **redis**: Redis with a healthcheck for worker-ready environments.
 
@@ -44,6 +44,10 @@ It does not include a production frontend proxy or a Celery worker deployment.
 Use managed PostgreSQL and provider secret management in production. Run
 `alembic upgrade head` as an explicit release step after a verified backup;
 do not rely on automatic migrations during application boot.
+See [MIGRATIONS.md](MIGRATIONS.md) before upgrading an existing installation.
+For local Compose commands, use `--env-file backend/.env` to supply the required
+`SECRET_KEY`; copying the backend template alone does not populate Compose's
+repository-root interpolation environment.
 
 ## Production Security Best Practices
 

@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from alembic import command
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -7,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.api.dependencies import get_db
-from app.core.database import Base
 from app.core.security import create_access_token, hash_password
 from app.domain.enums.user import ApprovalStatus
 from app.infrastructure.models.iam import Permission, Role, User
@@ -15,14 +15,17 @@ from app.main import app
 
 
 @pytest.fixture
-def api_client():
+def api_client(migration_config, monkeypatch):
     engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
+    with engine.begin() as connection:
+        migration_config.attributes["connection"] = connection
+        command.upgrade(migration_config, "head")
+    monkeypatch.setattr("app.main.engine", engine)
+    Session = sessionmaker(bind=engine, autoflush=False)
     session = Session()
     admin_write = Permission(name="admin:write")
     network_view = Permission(name="network:view")
-    role = Role(name="Test Administrator", permissions=[admin_write, network_view])
+    role = Role(name="Test Administrator", permissions=[admin_write, network_view, Permission(name="dashboard:view"), Permission(name="alerts:view"), Permission(name="alerts:edit")])
     session.add(role)
     session.flush()
     user = User(
@@ -56,12 +59,14 @@ def api_client():
 
 
 def test_sensor_enrollment_activation_and_submission(api_client):
+    assert api_client.get("/health").json() == {"status": "healthy", "database": "healthy"}
     assert api_client.get("/api/v1/network/overview").status_code == 200
     enrollment = api_client.post(
         "/api/v1/network/sensor/register",
         json={"name": "api-test-sensor", "platform": "Windows", "capabilities": {"arp_discovery": True}},
     )
     assert enrollment.status_code == 201
+    assert api_client.post("/api/v1/network/sensor/register", json={"name": "api-test-sensor"}).status_code == 409
     payload = enrollment.json()
     sensor_id = payload["sensor"]["id"]
     sensor_key = payload["sensor_key"]
@@ -74,6 +79,23 @@ def test_sensor_enrollment_activation_and_submission(api_client):
     )
     assert telemetry.status_code == 200
     assert telemetry.json()["devices_processed"] == 1
+    overview = api_client.get("/api/v1/dashboard/overview")
+    assert overview.status_code == 200
+    assert overview.json()["known_devices"] == 1
+    alerts = api_client.get("/api/v1/alerts/")
+    assert alerts.status_code == 200
+    alert_id = alerts.json()["items"][0]["id"]
+    assert api_client.patch(f"/api/v1/alerts/{alert_id}", json={"status": "INVESTIGATING", "reason": "Reviewing sensor evidence"}).status_code == 200
+    history = api_client.get(f"/api/v1/alerts/{alert_id}/history")
+    assert history.status_code == 200
+    assert history.json()[0]["new_status"] == "INVESTIGATING"
+    assert history.json()[0]["reason"] == "Reviewing sensor evidence"
+    for route in ("overview", "devices", "interfaces", "health", "history", "sensors"):
+        response = api_client.get(f"/api/v1/network/{route}")
+        assert response.status_code == 200, response.text
+        assert sensor_key not in response.text
+    assert api_client.post(f"/api/v1/network/admin/sensor/revoke/{sensor_id}").status_code == 204
+    assert api_client.post("/api/v1/network/sensor/data", headers={"X-Sensor-Id": sensor_id, "X-Sensor-Key": sensor_key}, json={}).status_code == 401
 
 
 def test_sensor_submission_rejects_invalid_key(api_client):

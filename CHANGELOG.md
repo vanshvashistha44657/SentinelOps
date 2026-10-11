@@ -15,7 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Restored the generic detection service contract used by ingestion, simulator, and rule routes.
-- Replaced destructive onboarding/network migration behavior with additive, idempotent migrations.
+- Added forward repair revision `e7b91c4a2d60` for existing onboarding/network schemas, preserving the published revision files and surviving records.
+- Added validated adoption of pre-existing security-alert tables and protection against the historical audit-table drop.
+- Fixed sensor-scoped device identity and alert deduplication, stale-sensor recovery, consecutive diagnostic failures, and canonical alert-history values.
+- Bounded DNS collection and rejected broadcast neighbors and unreachable ICMP replies as successful observations.
+- Added API tests using migrated databases and migration data-preservation regressions.
 - Added frontend environment-based API configuration and fixed admin TypeScript compilation errors.
 
 ## [0.1.0] - 2026-07-07

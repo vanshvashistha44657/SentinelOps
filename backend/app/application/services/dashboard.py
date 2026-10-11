@@ -8,6 +8,8 @@ from app.infrastructure.models.alerts import Alert
 from app.infrastructure.models.incidents import Case, Incident
 from app.infrastructure.models.network import NetworkDevice, NetworkHealthMeasurement
 from app.infrastructure.models.network_sensor import NetworkSensor
+from app.application.services.network import NetworkService
+from app.core.config import settings
 
 
 class DashboardService:
@@ -15,6 +17,7 @@ class DashboardService:
         self.db = db
 
     def get_overview(self) -> Dict[str, Any]:
+        NetworkService(self.db).mark_stale_sensors(settings.SENSOR_STALE_AFTER_SECONDS)
         return {
             "total_alerts": self.db.query(Alert).count(),
             "open_alerts": self.db.query(Alert).filter(Alert.status.in_(["NEW", "INVESTIGATING"])).count(),

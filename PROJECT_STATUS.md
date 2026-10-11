@@ -50,8 +50,11 @@
 
 ## Verification status
 - Backend startup import verified locally.
-- Backend migration chain verified against a clean in-memory SQLite database.
-- Backend tests: 11 passing; deprecation warnings remain in legacy schemas and datetime usage.
+- Alembic reports one head, `e7b91c4a2d60`; published revision files are preserved in this repair.
+- Migration tests cover clean and existing SQLite schemas, retained logs/security alerts/sensor children, and missing onboarding tables. See [MIGRATIONS.md](MIGRATIONS.md).
+- Backend tests: 29 passing, including health, enrollment, telemetry, dashboard, and alert-history API workflows against migrated databases. Dependency/schema/datetime deprecation warnings remain.
 - Frontend TypeScript check and production build pass.
 - Frontend ESLint passes with four TanStack Table compatibility warnings.
+- Docker Compose configuration validates with a non-secret placeholder `SECRET_KEY`; the default invocation fails when that required variable is unset.
+- Docker Desktop's Linux daemon was unavailable during verification, so container runtime and PostgreSQL migration execution were not tested.
 - Production database connectivity and live deployment were not verified from this workspace.

@@ -47,13 +47,16 @@ claim that an unfamiliar device is malicious without additional evidence.
 
 1. Copy `backend/.env.example` to `backend/.env` and set a strong local
    `SECRET_KEY` and development `DATABASE_URL`.
-2. Start services with `docker compose up --build`.
-3. Apply migrations with `docker compose exec backend alembic upgrade head`.
-4. Seed roles with `docker compose exec backend python seed_roles.py`.
+2. Start services with `docker compose --env-file backend/.env up --build`.
+3. Apply migrations with `docker compose --env-file backend/.env exec backend alembic upgrade head`.
+4. Seed roles with `docker compose --env-file backend/.env exec backend python seed_roles.py`.
 5. Start the frontend from `frontend/` with `npm install` and `npm run dev`.
 
 The browser API URL is configured with `frontend/.env.example` through
 `NEXT_PUBLIC_API_URL`. Do not place secrets in frontend environment variables.
+Use `--env-file backend/.env` for subsequent Compose commands too, unless
+`SECRET_KEY` is set in your shell or the repository-root `.env`. Existing
+databases should follow [the migration compatibility guide](MIGRATIONS.md).
 
 ## Host sensor
 
