@@ -5,6 +5,7 @@ from jose import jwt
 import secrets
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+import bcrypt
 from fastapi import HTTPException, status
 from app.core.config import settings
 
@@ -65,8 +66,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Verify a plaintext password against its Argon2id hash.
     """
     try:
+        if hashed_password.startswith(("$2a$", "$2b$", "$2y$")):
+            return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
         return ph.verify(hashed_password, plain_password)
-    except VerifyMismatchError:
+    except (VerifyMismatchError, ValueError, TypeError):
         return False
 ...
 
