@@ -57,8 +57,8 @@ class AlertService:
             self.db.add(AlertStatusHistory(
                 alert_id=alert.id,
                 changed_by_id=changed_by_id,
-                previous_status=str(old_status),
-                new_status=str(alert.status),
+                previous_status=getattr(old_status, "value", old_status),
+                new_status=getattr(alert.status, "value", alert.status),
                 reason=reason,
             ))
             

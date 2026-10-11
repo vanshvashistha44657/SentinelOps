@@ -10,11 +10,11 @@ import { AlertTriangle, ShieldAlert, Briefcase, ShieldCheck } from 'lucide-react
 export default function Dashboard() {
   const token = useAuthStore((state) => state.token);
   const router = useRouter();
-  const { data: overview, isLoading: loadingOverview } = useDashboardOverview();
-  const { data: metrics, isLoading: loadingMetrics } = useDashboardMetrics();
-  const { data: charts, isLoading: loadingCharts } = useDashboardCharts();
-  const { data: top, isLoading: loadingTop } = useDashboardTop();
-  const { data: alertsResponse } = useAlerts({ page: 1, size: 8 });
+  const { data: overview, isLoading: loadingOverview, isError: overviewError } = useDashboardOverview();
+  const { data: metrics, isLoading: loadingMetrics, isError: metricsError } = useDashboardMetrics();
+  const { data: charts, isLoading: loadingCharts, isError: chartsError } = useDashboardCharts();
+  const { isLoading: loadingTop, isError: topError } = useDashboardTop();
+  const { data: alertsResponse, isError: alertsError } = useAlerts({ page: 1, size: 8 });
 
   useEffect(() => {
     if (!token) router.push('/login');
@@ -22,6 +22,9 @@ export default function Dashboard() {
 
   if (!token) return null;
   if (loadingOverview || loadingMetrics || loadingCharts || loadingTop) return <DashboardLayout>Loading...</DashboardLayout>;
+  if (overviewError || metricsError || chartsError || topError || alertsError) {
+    return <DashboardLayout><div role="alert" className="text-critical">Dashboard data is unavailable. Check API connectivity and your session; no monitoring status can be inferred while requests are failing.</div></DashboardLayout>;
+  }
 
   const stats = [
     { title: "Critical Alerts", value: overview?.critical_alerts || 0, icon: AlertTriangle, variant: "critical" },

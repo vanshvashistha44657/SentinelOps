@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
   // This is a bit tricky in Zustand because we are outside of a React component.
   // We can access the store directly.
   const token = useAuthStore.getState().token;
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

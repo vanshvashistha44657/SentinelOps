@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -74,4 +75,9 @@ def health_check():
             connection.execute(text("SELECT 1"))
         return {"status": "healthy", "database": "healthy"}
     except Exception:
-        return {"status": "degraded", "database": "unavailable"}
+        return JSONResponse(status_code=503, content={"status": "degraded", "database": "unavailable"})
+
+
+@app.get("/version", tags=["System"])
+def version():
+    return {"application": "SentinelOps", "commit": settings.RENDER_GIT_COMMIT or "local"}

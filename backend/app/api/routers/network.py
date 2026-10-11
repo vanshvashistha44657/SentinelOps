@@ -4,12 +4,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.api.dependencies import get_db
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.rbac import RBAC
 from app.application.services.audit import AuditService
 from app.application.services.network import NetworkService
+from app.core.config import settings
 from app.infrastructure.models.network import NetworkDevice, NetworkHealthMeasurement, NetworkInterface, NetworkSnapshot
 from app.infrastructure.models.network_sensor import NetworkSensor
 from app.infrastructure.repositories.audit import SQLAlchemyAuditRepository
@@ -54,13 +56,20 @@ def register_sensor(
     service: NetworkService = Depends(get_network_service),
     audit: AuditService = Depends(get_audit_service),
 ):
-    sensor, key = service.enroll_sensor(registration.name, registration.platform, registration.version, registration.capabilities, current_user.id)
+    try:
+        sensor, key = service.enroll_sensor(registration.name, registration.platform, registration.version, registration.capabilities, current_user.id)
+    except IntegrityError:
+        service.db.rollback()
+        if service.db.query(NetworkSensor).filter(NetworkSensor.name == registration.name).first():
+            raise HTTPException(status_code=409, detail="A sensor with this name already exists")
+        raise
     audit.log_action(current_user.id, request.client.host, "network_sensors", "SENSOR_REGISTER", None, {"sensor_id": str(sensor.id), "name": sensor.name})
     return {"sensor": sensor, "sensor_key": key}
 
 
 @router.get("/sensors", response_model=List[SensorResponse], dependencies=[Depends(RBAC("network:view"))])
 def list_sensors(db: Session = Depends(get_db)):
+    NetworkService(db).mark_stale_sensors(settings.SENSOR_STALE_AFTER_SECONDS)
     return db.query(NetworkSensor).order_by(NetworkSensor.created_at.desc()).all()
 
 
@@ -108,6 +117,7 @@ def get_devices(
     size: int = Query(50, ge=1, le=200),
     status_filter: Optional[str] = Query(None, alias="status"),
 ):
+    NetworkService(db).mark_stale_sensors(settings.SENSOR_STALE_AFTER_SECONDS)
     query = db.query(NetworkDevice)
     if status_filter:
         query = query.filter(NetworkDevice.status == status_filter)
@@ -124,8 +134,9 @@ def get_interfaces(db: Session = Depends(get_db), sensor_id: Optional[UUID] = No
 
 @router.get("/overview", dependencies=[Depends(RBAC("network:view"))])
 def get_overview(db: Session = Depends(get_db)):
+    NetworkService(db).mark_stale_sensors(settings.SENSOR_STALE_AFTER_SECONDS)
     sensor = db.query(NetworkSensor).order_by(NetworkSensor.last_telemetry_at.desc().nullslast()).first()
-    snapshot = db.query(NetworkSnapshot).order_by(NetworkSnapshot.captured_at.desc()).first()
+    snapshot = db.query(NetworkSnapshot).filter(NetworkSnapshot.sensor_id == sensor.id).order_by(NetworkSnapshot.captured_at.desc()).first() if sensor else None
     return {
         "sensor": SensorResponse.model_validate(sensor).model_dump(mode="json") if sensor else None,
         "snapshot": NetworkSnapshotResponse.model_validate(snapshot).model_dump(mode="json") if snapshot else None,

@@ -6,6 +6,7 @@ import os
 import re
 import socket
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -42,6 +43,8 @@ def discover_neighbors() -> List[Dict[str, Any]]:
             ip = parts[0]
             mac = _normalize_mac(parts[parts.index("lladdr") + 1])
             interface = parts[parts.index("dev") + 1] if "dev" in parts else None
+        if not mac or int(mac[:2], 16) & 1:
+            continue
         try:
             address = ipaddress.ip_address(ip)
             if address.is_multicast or address.is_unspecified or address.is_loopback or address.is_reserved:
@@ -62,11 +65,12 @@ def _dns_check(server: Optional[str]) -> Dict[str, Any]:
     if not server:
         return {"check_type": "DNS", "status": "UNAVAILABLE", "detail": {"reason": "no DNS server reported"}}
     started = time.monotonic()
-    try:
-        socket.gethostbyname("example.com")
+    # gethostbyname has no per-call timeout. Isolate it in a bounded process so
+    # an unavailable resolver cannot stall all future telemetry cycles.
+    result = _run([sys.executable, "-c", "import socket; print(socket.gethostbyname('example.com'))"], timeout=3)
+    if result.strip():
         return {"check_type": "DNS", "target": server, "status": "PASS", "latency_ms": round((time.monotonic() - started) * 1000, 2), "detail": {"method": "OS resolver"}}
-    except OSError as exc:
-        return {"check_type": "DNS", "target": server, "status": "FAIL", "detail": {"method": "OS resolver", "error": str(exc)}}
+    return {"check_type": "DNS", "target": server, "status": "FAIL", "detail": {"method": "OS resolver", "error": "resolution failed or exceeded 3 seconds"}}
 
 
 def _reachability_check(target: Optional[str], check_type: str) -> Dict[str, Any]:
@@ -75,7 +79,9 @@ def _reachability_check(target: Optional[str], check_type: str) -> Dict[str, Any
     command = ["ping", "-n", "1", "-w", "1000", target] if platform.system() == "Windows" else ["ping", "-c", "1", "-W", "1", target]
     started = time.monotonic()
     output = _run(command, timeout=3)
-    passed = bool(output)
+    # Windows ping may exit successfully after an ICMP 'unreachable' reply.
+    # Require an actual echo reply, not simply nonempty command output.
+    passed = bool(re.search(r"\bttl[= ]\d+", output, re.IGNORECASE))
     return {
         "check_type": check_type,
         "target": target,
@@ -116,11 +122,13 @@ def collect_network_state() -> Dict[str, Any]:
         if ":" not in line:
             continue
         key, value = (part.strip() for part in line.split(":", 1))
-        mapping = {"SSID": "ssid", "BSSID": "bssid", "Signal": "link_quality", "Channel": "channel", "Radio type": "wifi_band", "Authentication": "security_protocol", "State": "connection_status"}
+        mapping = {"SSID": "ssid", "BSSID": "bssid", "Signal": "link_quality", "Channel": "channel", "Band": "wifi_band", "Authentication": "security_protocol", "State": "connection_status"}
         if key in mapping:
             wifi[mapping[key]] = float(value.rstrip("%")) if key == "Signal" and value.rstrip("%").replace(".", "", 1).isdigit() else int(value) if key == "Channel" and value.isdigit() else value
     if wifi and interfaces:
         interfaces[0].update({"interface_type": "Wi-Fi", **wifi})
+    if "connection_status" in wifi:
+        wifi["connection_status"] = wifi["connection_status"].upper()
 
     gateway = None
     route_output = _run(["route", "print", "-4"]) if system == "Windows" else _run(["ip", "route"])

@@ -6,7 +6,7 @@ The SentinelOps backend exposes a REST API built with FastAPI. All requests and 
 
 - Production API: `https://api.sentinelsops.internal/api/v1`
 - Local Development: `http://localhost:8000/api/v1`
-- Swagger Documentation: `/docs` (or `/api/v1/docs`)
+- Swagger Documentation: `/docs`
 
 ---
 
@@ -25,6 +25,7 @@ The SentinelOps backend exposes a REST API built with FastAPI. All requests and 
 - `GET /alerts`: Query, filter, and paginate alerts (filter by severity, status, source/destination IP, analyst).
 - `GET /alerts/{id}`: Detailed view of a single alert.
 - `PATCH /alerts/{id}`: Update alert state (assign to analyst, update status to TRUE_POSITIVE/FALSE_POSITIVE).
+- `GET /alerts/{id}/history`: Canonical status changes, actor, reason, and timestamp.
 - `POST /alerts/ingest`: Raw log ingestion pipeline endpoint.
 
 ### 3. Incident & Case Management (`/incidents`)
@@ -47,6 +48,7 @@ The SentinelOps backend exposes a REST API built with FastAPI. All requests and 
 - `POST /network/sensor/data`: Authenticated sensor telemetry submission.
 - `POST /network/admin/sensor/activate/{id}`: Activate a pending sensor.
 - `POST /network/admin/sensor/revoke/{id}`: Revoke a sensor credential.
+- `GET /network/sensors`: List enrolled sensors without returning credentials.
 - `GET /network/overview`: Current snapshot, sensor freshness, device counts, and visibility limitations.
 - `GET /network/interfaces`: Persisted interface inventory.
 - `GET /network/devices`: Paginated observed device inventory.
@@ -55,3 +57,8 @@ The SentinelOps backend exposes a REST API built with FastAPI. All requests and 
 
 Network status labels describe the measurement method and timestamp. A
 neighbor-table observation is limited evidence and is not a complete inventory.
+Device identity and alert deduplication are scoped to the observing sensor so
+private addresses on unrelated LANs do not merge. Freshness uses server receipt
+time. Network inventory/overview and dashboard overview reads refresh stale
+status; an offline sensor can resume with its existing key, while a revoked
+sensor remains unauthorized. No background stale-status scheduler is included.

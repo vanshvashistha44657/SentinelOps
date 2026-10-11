@@ -28,26 +28,26 @@ The easiest way to run the full stack is using Docker Compose:
 
 3. Launch services:
    ```bash
-   docker-compose up -d
+   docker compose --env-file backend/.env up --build -d
    ```
    This will automatically:
    - Build the backend container.
    - Start PostgreSQL and Redis.
-    - Start the FastAPI application.
+   - Start the FastAPI application.
 
    Apply migrations explicitly after PostgreSQL is healthy:
    ```bash
-   docker-compose exec backend alembic upgrade head
+   docker compose --env-file backend/.env exec backend alembic upgrade head
    ```
 
 4. Seed roles and permissions once:
    ```bash
-   docker-compose exec backend python seed_roles.py
+   docker compose --env-file backend/.env exec backend python seed_roles.py
    ```
 
 ### 2. Access
 
-- **API**: `http://localhost:8000/api/v1/docs`
+- **API docs**: `http://localhost:8000/docs`
 - **Frontend**: `http://localhost:3000` after starting Next.js.
 
 ---
@@ -57,6 +57,8 @@ The easiest way to run the full stack is using Docker Compose:
 For local development without Docker, use a PostgreSQL database represented by
 `DATABASE_URL`; SQLite files under `backend/` are legacy test fixtures and are
 not the production database.
+See [MIGRATIONS.md](MIGRATIONS.md) for the published revision chain, existing
+schema recovery, isolated migration tests, and the required new repair revision.
 
 ## Network sensor enrollment
 
