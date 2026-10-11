@@ -22,8 +22,13 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_postgres_url(cls, value):
         # Managed providers can return the historical postgres:// scheme.
-        if isinstance(value, str) and value.startswith("postgres://"):
-            return "postgresql+psycopg2://" + value[len("postgres://"):]
+        if isinstance(value, str):
+            if value.startswith("postgres://"):
+                return "postgresql+psycopg2://" + value[len("postgres://"):]
+            if value.startswith("postgresql://"):
+                return "postgresql+psycopg2://" + value[len("postgresql://"):]
+            if value.startswith("postgresql+psycopg://"):
+                return "postgresql+psycopg2://" + value[len("postgresql+psycopg://"):]
         return value
 
     @model_validator(mode="after")
